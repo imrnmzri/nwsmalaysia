@@ -1,6 +1,10 @@
 # National Weather System Website, Malaysia
 An NWS-like website as an idea to improve visibility of real-time and historical weather data in Malaysia. Focus on fast-to-navigate website, data-heavy information, and priotizing alerts/releases. Inspired by NWS Tulsa and the fact that I almost had a heatstroke on a day that is already warned to be really hot but I can only know that through being extremely online instead of the warning being integrated to the default weather app, SMS, anything but having to open facebook.  
-To run this: php -S localhost:8000  
+Update (2/21/2026): 
+1. tesseract OCR to extract text from image and turn into a warning box on top
+2. attempt to make map: failed. NWS has a pre-configured image that is already mapped with weather, cropped to its divisions, and turn into png files that is clickable. a lot of work for just one person
+3. Next steps: biggest issue of METmalaysia is data mapping; warnings are not mapped, everyone gets warnings for a weather in Sarawak; start storing historical data? more data work next; create issues to get help; remove earthquake, useless to KV
+
 Update (2/18/2026): 
 1. Split php and CSS in separate files
 2. Add Damansara

@@ -20,6 +20,53 @@ function fetchData($url) {
     return json_decode($response, true);
 }
 
+// OCR the advisory image with Tesseract
+function getAdvisoryOcrText() {
+    $imageUrl  = 'https://www.met.gov.my/data/pocgn/ramalancuacasignifikan.jpg';
+    $tmpImage  = sys_get_temp_dir() . '/advisory_' . md5($imageUrl) . '.jpg';
+    $tmpOutput = sys_get_temp_dir() . '/advisory_ocr_' . md5($imageUrl);
+    $cacheFile = $tmpOutput . '.txt';
+
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
+        return file_get_contents($cacheFile);
+    }
+
+    $imageData = @file_get_contents($imageUrl);
+    if ($imageData === false) return null;
+    file_put_contents($tmpImage, $imageData);
+
+    $tesseractPath = '/usr/bin/tesseract';
+    exec(escapeshellcmd("$tesseractPath " . escapeshellarg($tmpImage) . ' ' . escapeshellarg($tmpOutput) . ' -l msa 2>/dev/null'));
+
+    if (!file_exists($cacheFile)) return null;
+    return file_get_contents($cacheFile);
+}
+
+// Extract body text and issued date from raw OCR
+function parseAdvisoryOcr($rawOcr) {
+    $body   = '';
+    $issued = '';
+
+    if (preg_match('/RAMALAN.+?(?=Dikeluarkan)/is', $rawOcr, $m)) {
+        $body = trim(preg_replace('/^.*?SIGNIFIKAN\s*/is', '', trim($m[0])));
+        $body = trim(preg_replace('/^[@\s]+/', '', $body));
+        $body = trim(preg_replace('/Orang awam.+$/is', '', $body));
+    }
+    if (preg_match('/Dikeluarkan\s*:\s*.+?(?:\n|$)/i', $rawOcr, $m)) {
+        $issued = trim($m[0]);
+    }
+
+    return [$body, $issued];
+}
+
+// Run advisory pipeline
+$advisoryText   = '';
+$advisoryIssued = '';
+$rawOcr = getAdvisoryOcrText();
+if ($rawOcr) {
+    [$advisoryText, $advisoryIssued] = parseAdvisoryOcr($rawOcr);
+}
+
 // Map forecast text to emoji
 function weatherEmoji($text) {
     $t = strtolower($text);
@@ -79,6 +126,14 @@ foreach ($forecastsByLocation as $location => &$forecasts) {
     usort($forecasts, function($a, $b) {
         return strtotime($a['date']) - strtotime($b['date']);
     });
+}
+
+// Build location-to-anchor map for the SVG click targets
+// Keys must loosely match location_name from API
+$locationAnchors = [];
+foreach ($forecastsByLocation as $location => $forecasts) {
+    $id = 'loc-' . preg_replace('/[^a-z0-9]+/', '-', strtolower($location));
+    $locationAnchors[$location] = $id;
 }
 
 // Keywords indicating a warning affects Klang Valley
@@ -161,14 +216,25 @@ $currentTime = date('l, F j, Y g:i A');
         <div class="content">
             <div class="layout">
                 <div class="main-content">
-
-                    <!-- SIGNIFICANT WEATHER ADVISORY IMAGE -->
-                    <div class="advisory-image-section">
-                        <div class="section-title">🌦️ SIGNIFICANT WEATHER ADVISORY</div>
-                        <div class="advisory-image-box">
-                            <img src="https://www.met.gov.my/data/pocgn/ramalancuacasignifikan.jpg" alt="Ramalan Cuaca Signifikan">
-                        </div>
-                    </div>
+                
+                    <!-- RAMALAN CUACA SIGNIFIKAN -->
+                    <?php if (!empty($advisoryText)): ?>
+		    <div class="advisory-topbar">
+			<div class="advisory-topbar-icon">
+			    <img src="https://www.weather.gov/bundles/templating/images/top_news/important.png" alt="!">
+			</div>
+			<div class="advisory-topbar-content">
+			    <div class="advisory-topbar-title">Ramalan Cuaca Signifikan</div>
+			    <div class="advisory-topbar-body">
+				<?php echo htmlspecialchars($advisoryText); ?>
+				<?php if ($advisoryIssued): ?>
+				    <span class="advisory-topbar-issued"><?php echo htmlspecialchars($advisoryIssued); ?></span>
+				<?php endif; ?>
+				<a class="advisory-topbar-link" href="https://www.met.gov.my/data/pocgn/ramalancuacasignifikan.jpg" target="_blank">Baca Lanjut &rsaquo;</a>
+			    </div>
+			</div>
+		    </div>
+		    <?php endif; ?>
 
                     <!-- WARNINGS SECTION -->
                     <div id="warnings" class="warning-section">
@@ -231,7 +297,10 @@ $currentTime = date('l, F j, Y g:i A');
                         <?php else: ?>
                             <div class="update-time">Forecast issued: Daily by MET Malaysia</div>
                             <?php foreach ($forecastsByLocation as $location => $forecasts): ?>
-                                <div class="location-header"><?php echo htmlspecialchars($location); ?></div>
+                                <?php $anchorId = 'loc-' . preg_replace('/[^a-z0-9]+/', '-', strtolower($location)); ?>
+                                <div class="location-header" id="<?php echo $anchorId; ?>">
+                                    <?php echo htmlspecialchars($location); ?>
+                                </div>
                                 <table>
                                     <thead>
                                         <tr>
@@ -386,6 +455,25 @@ $currentTime = date('l, F j, Y g:i A');
             } else {
                 body.classList.add('open');
                 icon.classList.add('open');
+            }
+        }
+
+        function jumpTo(zone, anchorId) {
+            // Highlight clicked zone
+            document.querySelectorAll('.map-zone').forEach(function(z) {
+                z.classList.remove('map-zone-active');
+            });
+            zone.classList.add('map-zone-active');
+
+            // Scroll to the location header
+            var target = document.getElementById(anchorId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Flash highlight
+                target.classList.add('location-header-flash');
+                setTimeout(function() {
+                    target.classList.remove('location-header-flash');
+                }, 2000);
             }
         }
     </script>
