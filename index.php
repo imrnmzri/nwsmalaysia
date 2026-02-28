@@ -7,8 +7,26 @@ $forecastApiUrl   = "https://api.data.gov.my/weather/forecast/";
 $warningApiUrl    = "https://api.data.gov.my/weather/warning/";
 $earthquakeApiUrl = "https://api.data.gov.my/weather/warning/earthquake";
 
-// Klang Valley town (bandar) locations to filter
-$klangValleyTowns = ['Kuala Lumpur', 'Petaling', 'Shah Alam', 'Klang', 'Putrajaya', 'Subang', 'Damansara'];
+// Klang Valley states (only config needed — town names come from locations.csv)
+$klangValleyStates = ['Selangor', 'WP Kuala Lumpur', 'WP Putrajaya'];
+
+// Load locations.csv and derive Klang Valley towns + keywords
+$klangValleyTowns   = [];
+$klangValleyLocNames = [];
+$csvFile = __DIR__ . '/locations.csv';
+if (($fh = fopen($csvFile, 'r')) !== false) {
+    $header = fgetcsv($fh); // type, id, name, state
+    while (($row = fgetcsv($fh)) !== false) {
+        [$type, $id, $name, $state] = $row;
+        if (in_array($state, $klangValleyStates)) {
+            $klangValleyLocNames[] = $name;          // all types, for warning matching
+            if ($type === 'Town') {
+                $klangValleyTowns[] = $name;         // towns only, for forecast filtering
+            }
+        }
+    }
+    fclose($fh);
+}
 
 // Fetch data function
 function fetchData($url) {
@@ -136,15 +154,8 @@ foreach ($forecastsByLocation as $location => $forecasts) {
     $locationAnchors[$location] = $id;
 }
 
-// Keywords indicating a warning affects Klang Valley
-$kvKeywords = [
-    'klang valley', 'lembah klang',
-    'kuala lumpur', 'wilayah persekutuan',
-    'selangor', 'petaling', 'shah alam',
-    'subang', 'klang', 'putrajaya',
-    'cyberjaya', 'ampang', 'cheras',
-    'kepong', 'bangsar', 'damansara'
-];
+// Keywords from CSV: all Klang Valley location names + state names
+$kvKeywords = array_map('strtolower', array_merge($klangValleyStates, $klangValleyLocNames));
 
 // Filter warnings to only those mentioning Klang Valley region
 $klangValleyWarnings = [];
@@ -340,7 +351,7 @@ $currentTime = date('l, F j, Y g:i A');
                         <?php endif; ?>
                     </div>
 
-                    <!-- EARTHQUAKE SECTION -->
+                    <?php /* EARTHQUAKE SECTION — commented out
                     <div id="earthquake" class="section">
                         <div class="section-title">RECENT EARTHQUAKE ACTIVITY</div>
                         <?php if ($earthquakeData === null): ?>
@@ -360,50 +371,27 @@ $currentTime = date('l, F j, Y g:i A');
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($earthquakeData as $eq): ?>
-                                        <?php
+                                    foreach ($earthquakeData as $eq):
                                         $mag       = $eq['magdefault'] ?? 0;
                                         $magClass  = $mag >= 6.0 ? 'mag-high' : ($mag >= 5.0 ? 'mag-medium' : '');
                                         $localTime = isset($eq['localdatetime']) ? date('l, M j, Y g:i A', strtotime($eq['localdatetime'])) : 'N/A';
-                                        ?>
                                         <tr>
-                                            <td><?php echo $localTime; ?></td>
-                                            <td class="magnitude <?php echo $magClass; ?>">
-                                                <?php echo $mag; ?> <?php echo htmlspecialchars($eq['magtypedefault'] ?? 'N/A'); ?>
-                                            </td>
-                                            <td><?php echo $eq['depth'] ?? 'N/A'; ?> km</td>
-                                            <td>
-                                                <strong><?php echo htmlspecialchars($eq['location'] ?? 'N/A'); ?></strong><br>
-                                                <small><?php echo htmlspecialchars($eq['location_original'] ?? 'N/A'); ?></small><br>
-                                                <small><?php echo htmlspecialchars($eq['lat_vector'] ?? ''); ?>, <?php echo htmlspecialchars($eq['lon_vector'] ?? ''); ?></small>
-                                            </td>
-                                            <td>
-                                                <strong>Malaysia:</strong> <?php echo htmlspecialchars($eq['nbm_distancemas'] ?? 'N/A'); ?><br>
-                                                <strong>Other:</strong> <?php echo htmlspecialchars($eq['nbm_distancerest'] ?? 'N/A'); ?>
-                                            </td>
+                                            <td>$localTime</td>
+                                            <td class="magnitude $magClass">$mag magtypedefault</td>
+                                            <td>depth km</td>
+                                            <td><strong>location</strong><br>location_original<br>lat, lon</td>
+                                            <td><strong>Malaysia:</strong> nbm_distancemas<br><strong>Other:</strong> nbm_distancerest</td>
                                         </tr>
-                                    <?php endforeach; ?>
+                                    endforeach
                                 </tbody>
                             </table>
-                        <?php endif; ?>
+                        endif
                     </div>
+                    */ ?>
 
                 </div>
 
                 <div class="sidebar">
-                    <div class="info-box">
-                        <h3>KLANG VALLEY COVERAGE</h3>
-                        <ul>
-                            <li>Kuala Lumpur</li>
-                            <li>Petaling Jaya</li>
-                            <li>Shah Alam</li>
-                            <li>Subang Jaya</li>
-                            <li>Pelabuhan Klang</li>
-                            <li>Putrajaya</li>
-                            <li>Cyberjaya</li>
-                            <li>Damansara</li>
-                        </ul>
-                    </div>
 
                     <div class="info-box">
                         <h3>DATA SOURCE</h3>

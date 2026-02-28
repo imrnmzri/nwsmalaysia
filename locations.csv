@@ -1,0 +1,347 @@
+type,id,name,state
+State,St001,Perlis,Perlis
+State,St002,Kedah,Kedah
+State,St003,Pulau Pinang,Pulau Pinang
+State,St004,Perak,Perak
+State,St005,Kelantan,Kelantan
+State,St006,Terengganu,Terengganu
+State,St007,Pahang,Pahang
+State,St008,Selangor,Selangor
+State,St009,WP Kuala Lumpur,WP Kuala Lumpur
+State,St010,WP Putrajaya,WP Putrajaya
+State,St011,Negeri Sembilan,Negeri Sembilan
+State,St012,Melaka,Melaka
+State,St013,Johor,Johor
+State,St501,Sarawak,Sarawak
+State,St502,Sabah,Sabah
+State,St503,WP Labuan,WP Labuan
+District,Ds001,Langkawi,Kedah
+District,Ds002,Perlis,Perlis
+District,Ds003,Kubang Pasu,Kedah
+District,Ds004,Kota Setar,Kedah
+District,Ds005,Pokok Sena,Kedah
+District,Ds006,Padang Terap,Kedah
+District,Ds007,Yan,Kedah
+District,Ds008,Pendang,Kedah
+District,Ds009,Kuala Muda,Kedah
+District,Ds010,Sik,Kedah
+District,Ds011,Barat Daya,Pulau Pinang
+District,Ds012,Timur Laut,Pulau Pinang
+District,Ds013,Seberang Perai Utara,Pulau Pinang
+District,Ds014,Seberang Perai Tengah,Pulau Pinang
+District,Ds015,Baling,Kedah
+District,Ds016,Kulim,Kedah
+District,Ds017,Seberang Perai Selatan,Pulau Pinang
+District,Ds018,Bandar Baharu,Kedah
+District,Ds019,Kerian,Perak
+District,Ds020,"Larut, Matang Dan Selama",Perak
+District,Ds021,Hulu Perak,Perak
+District,Ds022,Tumpat,Kelantan
+District,Ds023,Pasir Mas,Kelantan
+District,Ds024,Kota Bharu,Kelantan
+District,Ds025,Jeli,Kelantan
+District,Ds026,Kuala Kangsar,Perak
+District,Ds027,Tanah Merah,Kelantan
+District,Ds028,Bachok,Kelantan
+District,Ds029,Manjung,Perak
+District,Ds030,Machang,Kelantan
+District,Ds031,Pasir Puteh,Kelantan
+District,Ds032,Kinta,Perak
+District,Ds033,Perak Tengah,Perak
+District,Ds034,Kuala Krai,Kelantan
+District,Ds035,Kampar,Perak
+District,Ds036,Bagan Datuk,Perak
+District,Ds037,Besut,Terengganu
+District,Ds038,Tanah Tinggi Cameron,Pahang
+District,Ds039,Gua Musang,Kelantan
+District,Ds040,Hilir Perak,Perak
+District,Ds041,Batang Padang,Perak
+District,Ds042,Setiu,Terengganu
+District,Ds043,Sabak Bernam,Selangor
+District,Ds044,Lipis,Pahang
+District,Ds045,Muallim,Perak
+District,Ds046,Kuala Nerus,Terengganu
+District,Ds047,Hulu Terengganu,Terengganu
+District,Ds048,Kuala Terengganu,Terengganu
+District,Ds049,Kuala Selangor,Selangor
+District,Ds050,Raub,Pahang
+District,Ds051,Hulu Selangor,Selangor
+District,Ds052,Marang,Terengganu
+District,Ds053,Jerantut,Pahang
+District,Ds054,Klang,Selangor
+District,Ds055,Gombak,Selangor
+District,Ds056,Dungun,Terengganu
+District,Ds057,Petaling,Selangor
+District,Ds058,Kuala Lumpur,WP Kuala Lumpur
+District,Ds059,Bentong,Pahang
+District,Ds060,Kuala Langat,Selangor
+District,Ds061,Temerloh,Pahang
+District,Ds062,Putrajaya,WP Putrajaya
+District,Ds063,Hulu Langat,Selangor
+District,Ds064,Sepang,Selangor
+District,Ds065,Kemaman,Terengganu
+District,Ds066,Maran,Pahang
+District,Ds067,Jelebu,Negeri Sembilan
+District,Ds068,Seremban,Negeri Sembilan
+District,Ds069,Kuantan,Pahang
+District,Ds070,Port Dickson,Negeri Sembilan
+District,Ds071,Bera,Pahang
+District,Ds072,Kuala Pilah,Negeri Sembilan
+District,Ds073,Rembau,
+District,Ds074,Jempol,
+District,Ds075,Alor Gajah,
+District,Ds076,Pekan,
+District,Ds077,Tampin,
+District,Ds078,Melaka Tengah,Melaka
+District,Ds079,Jasin,
+District,Ds080,Rompin,
+District,Ds081,Tangkak,
+District,Ds082,Segamat,
+District,Ds083,Muar,
+District,Ds084,Batu Pahat,
+District,Ds085,Kluang,
+District,Ds086,Mersing,
+District,Ds087,Pontian,
+District,Ds088,Kulai,
+District,Ds089,Kota Tinggi,
+District,Ds090,Johor Bahru,Johor
+District,Ds501,Tebedu,
+District,Ds502,Bau,
+District,Ds503,Lundu,
+District,Ds504,Kuching,
+District,Ds505,Serian,
+District,Ds506,Samarahan,
+District,Ds507,Asajaya,
+District,Ds508,Simunjan,
+District,Ds509,Sri Aman,
+District,Ds510,Pusa,
+District,Ds511,Betong,
+District,Ds512,Saratok,
+District,Ds513,Kabong,
+District,Ds514,Lubok Antu,
+District,Ds515,Pakan,
+District,Ds516,Sarikei,
+District,Ds517,Tanjung Manis,
+District,Ds518,Julau,
+District,Ds519,Meradong,
+District,Ds520,Daro,
+District,Ds521,Sibu,
+District,Ds522,Kanowit,
+District,Ds523,Song,
+District,Ds524,Matu,
+District,Ds525,Dalat,
+District,Ds526,Selangau,
+District,Ds527,Mukah,
+District,Ds528,Kapit,
+District,Ds529,Bukit Mabong,
+District,Ds530,Tatau,
+District,Ds531,Bintulu,
+District,Ds532,Sebauh,
+District,Ds533,Belaga,
+District,Ds534,Subis,
+District,Ds535,Beluru,
+District,Ds536,Telang Usan,
+District,Ds537,Miri,
+District,Ds538,Marudi,
+District,Ds539,Limbang,
+District,Ds540,Lawas,
+District,Ds541,Sipitang,
+District,Ds542,FP Labuan,
+District,Ds543,Tenom,
+District,Ds544,Kuala Penyu,
+District,Ds545,Beaufort,
+District,Ds546,Nabawan,
+District,Ds547,Keningau,
+District,Ds548,Papar,
+District,Ds549,Putatan,
+District,Ds550,Penampang,
+District,Ds551,Tambunan,
+District,Ds552,Tawau,
+District,Ds553,Tongod,
+Town,Tn001,Perlis,Perlis
+Town,Tn002,Jitra,Kedah
+Town,Tn003,Alor Star,Kedah
+Town,Tn004,Pokok Sena,Kedah
+Town,Tn005,Kuala Nerang,Kedah
+Town,Tn006,Pendang,Kedah
+Town,Tn007,Yan,Kedah
+Town,Tn008,Sungai Petani,Kedah
+Town,Tn009,Balik Pulau,Pulau Pinang
+Town,Tn010,Ayer Itam,Pulau Pinang
+Town,Tn011,Sik,Kedah
+Town,Tn012,Kepala Batas,Pulau Pinang
+Town,Tn013,Georgetown,Pulau Pinang
+Town,Tn014,Butterworth,Pulau Pinang
+Town,Tn015,Bayan Lepas,Pulau Pinang
+Town,Tn016,Perai,Pulau Pinang
+Town,Tn017,Bukit Tengah,Pulau Pinang
+Town,Tn018,Bukit Mertajam,Pulau Pinang
+Town,Tn019,Batu Kawan,Pulau Pinang
+Town,Tn020,Kulim,Kedah
+Town,Tn021,Baling,Kedah
+Town,Tn022,Nibong Tebal,Pulau Pinang
+Town,Tn023,Serdang,Kedah
+Town,Tn024,Parit Buntar,Perak
+Town,Tn025,Selama,Perak
+Town,Tn026,Bagan Serai,Perak
+Town,Tn027,Gerik,Perak
+Town,Tn028,Lenggong,Perak
+Town,Tn029,Taiping,Perak
+Town,Tn030,Rantau Panjang,Kelantan
+Town,Tn031,Tumpat,Kelantan
+Town,Tn032,Pasir Mas,Kelantan
+Town,Tn033,Kota Bharu,Kelantan
+Town,Tn034,Jeli,Kelantan
+Town,Tn035,Kuala Kangsar,Perak
+Town,Tn036,Sungai Siput,Perak
+Town,Tn037,Bachok,Kelantan
+Town,Tn038,Tanah Merah,Kelantan
+Town,Tn039,Machang,Kelantan
+Town,Tn040,Sitiawan,Perak
+Town,Tn041,Ipoh,Perak
+Town,Tn042,Pasir Puteh,Kelantan
+Town,Tn043,Batu Gajah,Perak
+Town,Tn044,Seri Iskandar,Perak
+Town,Tn045,Kuala Krai,Kelantan
+Town,Tn046,Gopeng,Perak
+Town,Tn047,Besut,Terengganu
+Town,Tn048,Jerteh,Terengganu
+Town,Tn049,Bagan Datuk,Perak
+Town,Tn050,Kampar,Perak
+Town,Tn051,Teluk Intan,Perak
+Town,Tn052,Tapah,Perak
+Town,Tn053,Gua Musang,Kelantan
+Town,Tn054,Sabak Bernam,Selangor
+Town,Tn055,Bandar Permaisuri,Terengganu
+Town,Tn056,Setiu,Terengganu
+Town,Tn057,Slim River,Perak
+Town,Tn058,Kuala Nerus,Terengganu
+Town,Tn059,Kuala Terengganu,Terengganu
+Town,Tn060,Kuala Lipis,Pahang
+Town,Tn061,Kuala Selangor,Selangor
+Town,Tn062,Raub,Pahang
+Town,Tn063,Kuala Kubu Bharu,Selangor
+Town,Tn064,Rawang,Selangor
+Town,Tn065,Selayang,Selangor
+Town,Tn066,Pelabuhan Klang,Selangor
+Town,Tn067,Kepong,WP Kuala Lumpur
+Town,Tn068,Jerantut,Pahang
+Town,Tn069,Batu Caves,Selangor
+Town,Tn070,Shah Alam,Selangor
+Town,Tn071,Sentul,WP Kuala Lumpur
+Town,Tn072,Bentong,Pahang
+Town,Tn073,Jalan Duta,Selangor
+Town,Tn074,Damansara,Selangor
+Town,Tn075,Setapak,Selangor
+Town,Tn076,Petaling Jaya,WP Kuala Lumpur
+Town,Tn077,Subang Jaya,WP Kuala Lumpur
+Town,Tn078,Bangsar,Selangor
+Town,Tn079,Kuala Lumpur,WP Kuala Lumpur
+Town,Tn080,Bukit Bintang,
+Town,Tn081,Ampang,
+Town,Tn082,Dungun,
+Town,Tn083,Sungai Besi,
+Town,Tn084,Banting,
+Town,Tn085,Seri Kembangan,
+Town,Tn086,Cheras,
+Town,Tn087,Cyberjaya,
+Town,Tn088,Putrajaya,
+Town,Tn089,Paka,
+Town,Tn090,Kajang,
+Town,Tn091,Mentakab,
+Town,Tn092,Bangi,
+Town,Tn093,Semenyih,
+Town,Tn094,Kertih,
+Town,Tn095,Temerloh,
+Town,Tn096,Nilai,
+Town,Tn097,Sepang,
+Town,Tn098,Kemaman,
+Town,Tn099,Kuala Klawang,
+Town,Tn100,Jelebu,
+Town,Tn101,Triang,
+Town,Tn102,Bera,
+Town,Tn103,Maran,
+Town,Tn104,Seremban,
+Town,Tn105,Port Dickson,
+Town,Tn106,Kuala Pilah,
+Town,Tn107,Rembau,
+Town,Tn108,Kuantan,
+Town,Tn109,Jempol,
+Town,Tn110,Tampin,
+Town,Tn111,Masjid Tanah,
+Town,Tn112,Alor Gajah,
+Town,Tn113,Tangga Batu,
+Town,Tn114,Pekan,
+Town,Tn115,Durian Tunggal,
+Town,Tn116,Muadzam Shah,
+Town,Tn117,Gemas,
+Town,Tn118,Ayer Keroh,
+Town,Tn119,Bandaraya Melaka,Melaka
+Town,Tn120,Jasin,
+Town,Tn121,Tangkak,
+Town,Tn122,Merlimau,
+Town,Tn123,Segamat,
+Town,Tn124,Muar,
+Town,Tn125,Pagoh,
+Town,Tn126,Labis,
+Town,Tn127,Kuala Rompin,
+Town,Tn128,Yong Peng,
+Town,Tn129,Batu Pahat,
+Town,Tn130,Ayer Hitam,
+Town,Tn131,Kluang,
+Town,Tn132,Mersing,
+Town,Tn133,Simpang Renggam,
+Town,Tn134,Pontian,
+Town,Tn135,Kulai,
+Town,Tn136,Senai,
+Town,Tn137,Kota Tinggi,
+Town,Tn138,Iskandar Puteri,
+Town,Tn139,Johor Bahru,Johor
+Town,Tn140,Pasir Gudang,
+Town,Tn141,Lojing,
+Division,Dv501,Kuching,Sarawak
+Division,Dv502,Serian,Sarawak
+Division,Dv503,Samarahan,Sarawak
+Division,Dv504,Sri Aman,Sarawak
+Division,Dv505,Betong,Sarawak
+Division,Dv506,Sarikei,Sarawak
+Division,Dv507,Sibu,Sarawak
+Division,Dv508,Mukah,Sarawak
+Division,Dv509,Kapit,Sarawak
+Division,Dv510,Bintulu,Sarawak
+Division,Dv511,Miri,Sarawak
+Division,Dv512,Limbang,Sarawak
+Division,Dv513,FP Labuan,WP Labuan
+Division,Dv514,Pedalaman,Sabah
+Division,Dv515,Pantai Barat,Sabah
+Division,Dv516,Tawau,Sabah
+Division,Dv517,Sandakan,Sabah
+Division,Dv518,Kudat,Sabah
+Recreational,Rc001,Langkawi,Kedah
+Recreational,Rc002,Taman Negara Pulau Pinang,Pulau Pinang
+Recreational,Rc003,Batu Feringgi,Pulau Pinang
+Recreational,Rc004,Bukit Bendera,Pulau Pinang
+Recreational,Rc005,Pulau Pangkor,Perak
+Recreational,Rc006,Lumut,Perak
+Recreational,Rc007,Pulau Perhentian,Terengganu
+Recreational,Rc008,Cameron Highland,Pahang
+Recreational,Rc009,Pulau Redang,Terengganu
+Recreational,Rc010,Taman Negara Kelantan,Kelantan
+Recreational,Rc011,Tasik Kenyir,Terengganu
+Recreational,Rc012,Taman Negara Terengganu,Terengganu
+Recreational,Rc013,Taman Negara,Pahang
+Recreational,Rc014,Bukit Fraser,Pahang
+Recreational,Rc015,Pulau Kapas,Terengganu
+Recreational,Rc016,Tanah Tinggi Genting,Pahang
+Recreational,Rc017,Bukit Tinggi,Pahang
+Recreational,Rc018,Pusat Konservasi Gajah Kebangsaan,Pahang
+Recreational,Rc019,Tasik Bera,Pahang
+Recreational,Rc020,Tanjung Jara,Terengganu
+Recreational,Rc021,Paya Indah Wetlands,Selangor
+Recreational,Rc022,Kijal,Terengganu
+Recreational,Rc023,Cherating,Pahang
+Recreational,Rc024,Pulau Tioman,Pahang
+Recreational,Rc025,Pulau Sibu,Johor
+Recreational,Rc026,Desaru,Johor
+Recreational,Rc501,Taman Nasional Kinabalu,Sabah
+Recreational,Rc502,Pulau Sipadan,Sabah
