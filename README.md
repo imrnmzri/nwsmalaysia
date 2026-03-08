@@ -1,5 +1,8 @@
 # National Weather System Website, Malaysia
 An NWS-like website as an idea to improve visibility of real-time and historical weather data in Malaysia. Focus on fast-to-navigate website, data-heavy information, and priotizing alerts/releases. Inspired by NWS Tulsa and the fact that I almost had a heatstroke on a day that is already warned to be really hot but I can only know that through being extremely online instead of the warning being integrated to the default weather app, SMS, anything but having to open facebook.  
+Update (3/8/2026):
+1. Add radar, filter, and open-meteo for temperature.
+2. Next: Enrich the meteo data; Remove data source box; remove all earthquake instances; 7-DAY FORECAST — fix to include locations, its not there anymore; add links to nowcasting, https://www.met.gov.my/pencerapan/nowcasting/, https://www.met.gov.my/iklim/status-cuaca-panas/
 Update (2/21/2026): 
 1. Create a data mapping sheet, looks like it will need to be hardcoded all the time
 2. earthquake removed (maybe this will come back and be mapped similarly to warnings)

@@ -29,13 +29,33 @@ if (($fh = fopen($csvFile, 'r')) !== false) {
 }
 
 // Fetch data function
-function fetchData($url) {
-    $context = stream_context_create([
+function fetchData($url, $ttl = 600) {
+    $cacheFile = sys_get_temp_dir() . '/nwsmy_' . md5($url) . '.json';
+
+    // Serve from cache if fresh and non-empty
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $ttl && filesize($cacheFile) > 10) {
+        $cached = file_get_contents($cacheFile);
+        if ($cached) return json_decode($cached, true);
+    }
+
+    $context  = stream_context_create([
         'http' => ['timeout' => 10, 'user_agent' => 'NWS-Malaysia/1.0']
     ]);
     $response = @file_get_contents($url, false, $context);
-    if ($response === false) return null;
-    return json_decode($response, true);
+
+    // Only overwrite cache if we got a valid response
+    if ($response !== false && strlen($response) > 10) {
+        file_put_contents($cacheFile, $response);
+        return json_decode($response, true);
+    }
+
+    // API failed — return stale cache if available, better than nothing
+    if (file_exists($cacheFile) && filesize($cacheFile) > 10) {
+        $cached = file_get_contents($cacheFile);
+        if ($cached) return json_decode($cached, true);
+    }
+
+    return null;
 }
 
 // OCR the advisory image with Tesseract
@@ -45,18 +65,34 @@ function getAdvisoryOcrText() {
     $tmpOutput = sys_get_temp_dir() . '/advisory_ocr_' . md5($imageUrl);
     $cacheFile = $tmpOutput . '.txt';
 
-    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600) {
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 600 && filesize($cacheFile) > 0) {
         return file_get_contents($cacheFile);
     }
 
-    $imageData = @file_get_contents($imageUrl);
-    if ($imageData === false) return null;
+    $context   = stream_context_create(['http' => ['timeout' => 10, 'user_agent' => 'NWS-Malaysia/1.0']]);
+    $imageData = @file_get_contents($imageUrl, false, $context);
+    if ($imageData === false || strlen($imageData) < 1000) return null;
     file_put_contents($tmpImage, $imageData);
 
-    $tesseractPath = '/usr/bin/tesseract';
-    exec(escapeshellcmd("$tesseractPath " . escapeshellarg($tmpImage) . ' ' . escapeshellarg($tmpOutput) . ' -l msa 2>/dev/null'));
+    $tesseractPath = trim(shell_exec('which tesseract 2>/dev/null') ?: '/usr/bin/tesseract');
+    if (!is_executable($tesseractPath)) return null;
 
-    if (!file_exists($cacheFile)) return null;
+    $availLangs = shell_exec($tesseractPath . ' --list-langs 2>&1') ?: '';
+    $hasMsa = strpos($availLangs, 'msa') !== false;
+    $hasEng = strpos($availLangs, 'eng') !== false;
+    if ($hasMsa && $hasEng) { $langFlag = '-l msa+eng'; }
+    elseif ($hasMsa)        { $langFlag = '-l msa'; }
+    elseif ($hasEng)        { $langFlag = '-l eng'; }
+    else                    { $langFlag = ''; }
+
+    $cmd = $tesseractPath
+         . ' ' . escapeshellarg($tmpImage)
+         . ' ' . escapeshellarg($tmpOutput)
+         . ' ' . $langFlag
+         . ' --psm 6 2>/dev/null';
+    exec($cmd, $out, $code);
+
+    if ($code !== 0 || !file_exists($cacheFile) || filesize($cacheFile) === 0) return null;
     return file_get_contents($cacheFile);
 }
 
@@ -65,10 +101,13 @@ function parseAdvisoryOcr($rawOcr) {
     $body   = '';
     $issued = '';
 
-    if (preg_match('/RAMALAN.+?(?=Dikeluarkan)/is', $rawOcr, $m)) {
-        $body = trim(preg_replace('/^.*?SIGNIFIKAN\s*/is', '', trim($m[0])));
-        $body = trim(preg_replace('/^[@\s]+/', '', $body));
-        $body = trim(preg_replace('/Orang awam.+$/is', '', $body));
+    // The title "RAMALAN CUACA SIGNIFIKAN" is rendered as a graphic — Tesseract won't see it.
+    // Grab everything before "Dikeluarkan" as the body.
+    if (preg_match('/^(.+?)(?=Dikeluarkan)/is', $rawOcr, $m)) {
+        $body = trim($m[1]);
+        $body = preg_replace('/^[-\s*]+/', '', $body);   // strip leading dashes/symbols
+        $body = preg_replace('/Orang awam.+$/is', '', $body); // strip trailing boilerplate
+        $body = trim(preg_replace('/\s+/', ' ', $body)); // collapse whitespace
     }
     if (preg_match('/Dikeluarkan\s*:\s*.+?(?:\n|$)/i', $rawOcr, $m)) {
         $issued = trim($m[0]);
@@ -84,6 +123,7 @@ $rawOcr = getAdvisoryOcrText();
 if ($rawOcr) {
     [$advisoryText, $advisoryIssued] = parseAdvisoryOcr($rawOcr);
 }
+
 
 // Map forecast text to emoji
 function weatherEmoji($text) {
@@ -146,12 +186,93 @@ foreach ($forecastsByLocation as $location => &$forecasts) {
     });
 }
 
-// Build location-to-anchor map for the SVG click targets
-// Keys must loosely match location_name from API
+// Build location-to-anchor map
 $locationAnchors = [];
 foreach ($forecastsByLocation as $location => $forecasts) {
     $id = 'loc-' . preg_replace('/[^a-z0-9]+/', '-', strtolower($location));
     $locationAnchors[$location] = $id;
+}
+
+// Town coordinates for Open-Meteo current conditions
+$townCoords = [
+    'Kuala Lumpur'  => ['lat' => 3.1390,  'lon' => 101.6869],
+    'Petaling Jaya' => ['lat' => 3.1073,  'lon' => 101.6067],
+    'Shah Alam'     => ['lat' => 3.0738,  'lon' => 101.5183],
+    'Klang'         => ['lat' => 3.0449,  'lon' => 101.4457],
+    'Subang Jaya'   => ['lat' => 3.0565,  'lon' => 101.5851],
+    'Ampang'        => ['lat' => 3.1478,  'lon' => 101.7544],
+    'Cheras'        => ['lat' => 3.0804,  'lon' => 101.7493],
+    'Rawang'        => ['lat' => 3.3197,  'lon' => 101.5742],
+    'Sepang'        => ['lat' => 2.7360,  'lon' => 101.7013],
+    'Putrajaya'     => ['lat' => 2.9264,  'lon' => 101.6964],
+    'Cyberjaya'     => ['lat' => 2.9213,  'lon' => 101.6559],
+    'Kajang'        => ['lat' => 2.9932,  'lon' => 101.7877],
+    'Selayang'      => ['lat' => 3.2115,  'lon' => 101.6390],
+    'Puchong'       => ['lat' => 3.0268,  'lon' => 101.6195],
+];
+
+// Get selected location from URL — name passed directly, no slug
+$allLocationNames = array_keys($forecastsByLocation);
+sort($allLocationNames);
+$selectedLocation = trim($_GET['location'] ?? '');
+if (!in_array($selectedLocation, $allLocationNames, true)) {
+    $selectedLocation = '';
+}
+
+// Filter forecasts — all when blank, one when selected
+$filteredForecasts = $selectedLocation
+    ? (isset($forecastsByLocation[$selectedLocation]) ? [$selectedLocation => $forecastsByLocation[$selectedLocation]] : [])
+    : $forecastsByLocation;
+
+// Filter warnings to selected location + state-wide warnings
+$filteredWarnings = [];
+if ($warningData) {
+    $locKeywords = array_map('strtolower', $klangValleyStates);
+    if ($selectedLocation) $locKeywords[] = strtolower($selectedLocation);
+    foreach ($warningData as $warning) {
+        if (empty($warning['valid_from']) || empty($warning['valid_to'])) continue;
+        $searchable = strtolower(implode(' ', [
+            $warning['warning_issue']['title_en'] ?? '',
+            $warning['warning_issue']['title_bm'] ?? '',
+            $warning['heading_en'] ?? '',
+            $warning['heading_bm'] ?? '',
+            $warning['text_en']    ?? '',
+            $warning['text_bm']    ?? '',
+        ]));
+        foreach ($locKeywords as $kw) {
+            if (strpos($searchable, $kw) !== false) { $filteredWarnings[] = $warning; break; }
+        }
+    }
+}
+
+// Fetch current conditions from Open-Meteo (free, no key)
+$currentTemp = $currentWeather = $currentHumidity = $currentWind = null;
+$coords = null;
+foreach ($townCoords as $town => $c) {
+    if (stripos($selectedLocation, $town) !== false || stripos($town, $selectedLocation) !== false) {
+        $coords = $c; break;
+    }
+}
+if ($coords) {
+$meteoUrl  = "https://api.open-meteo.com/v1/forecast?latitude={$coords['lat']}&longitude={$coords['lon']}"
+           . "&current=temperature_2m,relative_humidity_2m,weathercode,windspeed_10m"
+           . "&timezone=Asia%2FKuala_Lumpur";
+$meteoData = fetchData($meteoUrl);
+if ($meteoData && isset($meteoData['current'])) {
+    $currentTemp     = $meteoData['current']['temperature_2m'] ?? null;
+    $currentHumidity = $meteoData['current']['relative_humidity_2m'] ?? null;
+    $currentWind     = $meteoData['current']['windspeed_10m'] ?? null;
+    $wmoCodes = [
+        0=>'Clear Sky', 1=>'Mainly Clear', 2=>'Partly Cloudy', 3=>'Overcast',
+        45=>'Foggy', 48=>'Icy Fog',
+        51=>'Light Drizzle', 53=>'Drizzle', 55=>'Heavy Drizzle',
+        61=>'Light Rain', 63=>'Rain', 65=>'Heavy Rain',
+        80=>'Rain Showers', 81=>'Heavy Showers', 82=>'Violent Showers',
+        95=>'Thunderstorm', 96=>'Thunderstorm w/ Hail', 99=>'Heavy Thunderstorm',
+    ];
+    $wcode          = $meteoData['current']['weathercode'] ?? null;
+    $currentWeather = $wmoCodes[$wcode] ?? 'Unknown';
+    }
 }
 
 // Keywords from CSV: all Klang Valley location names + state names
@@ -211,15 +332,31 @@ $currentTime = date('l, F j, Y g:i A');
 <body>
     <div class="header">
         <div class="container">
-            <h1>KLANG VALLEY WEATHER FORECAST</h1>
+            <a href="/" style="text-decoration:none;color:white;display:inline-flex;align-items:center;gap:14px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="22" r="10" fill="#FFD54F"/><line x1="32" y1="4" x2="32" y2="10" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="34" x2="32" y2="40" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="20" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="22" x2="50" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="8" x2="22" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="32" x2="46" y2="36" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="8" x2="42" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="36" x2="22" y2="32" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><rect x="8" y="36" width="48" height="18" rx="9" fill="white" opacity="0.95"/><circle cx="20" cy="36" r="9" fill="white" opacity="0.95"/><circle cx="36" cy="32" r="12" fill="white" opacity="0.95"/><circle cx="50" cy="37" r="7" fill="white" opacity="0.95"/></svg>
+                <div>
+                    <div style="font-size:22px;font-weight:bold;letter-spacing:1px;">Cuaca Lembah Klang</div>
+                    <div style="font-size:12px;opacity:0.75;letter-spacing:2px;">PERKHIDMATAN RAMALAN CUACA</div>
+                </div>
+            </a>
         </div>
     </div>
 
     <div class="nav">
-        <div class="container">
-            <a href="#warnings">CURRENT HAZARDS</a>
-            <a href="#forecast">FORECAST</a>
-            <a href="#earthquake">EARTHQUAKE DATA</a>
+        <div class="container" style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+            <form method="get" action="" style="display:flex; align-items:center; gap:8px; margin:0;">
+                <label for="loc-select" style="font-size:13px; font-weight:bold; color:#333;">KAWASAN:</label>
+                <select id="loc-select" name="location" onchange="this.form.submit();" style="font-size:13px; padding:3px 6px; border:1px solid #aaa; background:#fff;">
+                    <option value="" <?php echo ($selectedLocation === '') ? 'selected' : ''; ?>>— Semua Kawasan —</option>
+                    <?php foreach ($allLocationNames as $name): ?>
+                    <option value="<?php echo htmlspecialchars($name); ?>" <?php echo ($name === $selectedLocation) ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($name); ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+            <a href="#warnings" style="color:#3F51B5; text-decoration:none; font-size:13px;">CURRENT HAZARDS</a>
+            <a href="#forecast" style="color:#3F51B5; text-decoration:none; font-size:13px;">FORECAST</a>
         </div>
     </div>
 
@@ -227,38 +364,77 @@ $currentTime = date('l, F j, Y g:i A');
         <div class="content">
             <div class="layout">
                 <div class="main-content">
-                
                     <!-- RAMALAN CUACA SIGNIFIKAN -->
                     <?php if (!empty($advisoryText)): ?>
-		    <div class="advisory-topbar">
-			<div class="advisory-topbar-icon">
-			    <img src="https://www.weather.gov/bundles/templating/images/top_news/important.png" alt="!">
-			</div>
-			<div class="advisory-topbar-content">
-			    <div class="advisory-topbar-title">Ramalan Cuaca Signifikan</div>
-			    <div class="advisory-topbar-body">
-				<?php echo htmlspecialchars($advisoryText); ?>
-				<?php if ($advisoryIssued): ?>
-				    <span class="advisory-topbar-issued"><?php echo htmlspecialchars($advisoryIssued); ?></span>
-				<?php endif; ?>
-				<a class="advisory-topbar-link" href="https://www.met.gov.my/data/pocgn/ramalancuacasignifikan.jpg" target="_blank">Baca Lanjut &rsaquo;</a>
-			    </div>
-			</div>
-		    </div>
-		    <?php endif; ?>
+					<div class="advisory-topbar">
+					<div class="advisory-topbar-icon">
+						<img src="https://www.weather.gov/bundles/templating/images/top_news/important.png" alt="!">
+					</div>
+					<div class="advisory-topbar-content">
+						<div class="advisory-topbar-title">Ramalan Cuaca Signifikan</div>
+						<div class="advisory-topbar-body">
+						<?php echo htmlspecialchars($advisoryText); ?>
+						<?php if ($advisoryIssued): ?>
+							<span class="advisory-topbar-issued"><?php echo htmlspecialchars($advisoryIssued); ?></span>
+						<?php endif; ?>
+						<a class="advisory-topbar-link" href="https://www.met.gov.my/data/pocgn/ramalancuacasignifikan.jpg" target="_blank">Baca Lanjut &rsaquo;</a>
+						</div>
+					</div>
+					</div>
+					<?php endif; ?>
+
+					<!-- CURRENT CONDITIONS STRIP -->
+					<?php if ($currentTemp !== null): ?>
+
+					<?php
+					// Force default location if value is missing, null, empty, or "null"
+					$displayLocation = $selectedLocation;
+
+					if (!isset($displayLocation) || $displayLocation === null || trim($displayLocation) === '' || strtolower($displayLocation) === 'null') {
+						$displayLocation = 'Kuala Lumpur';
+					}
+					?>
+
+					<div style="background:#1A237E; color:#fff; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:30px; flex-wrap:wrap;">
+						
+						<div>
+							<div style="font-size:11px; text-transform:uppercase; opacity:0.7;">Current Conditions</div>
+							<div style="font-size:13px; font-weight:bold;">
+								<?php echo htmlspecialchars($displayLocation); ?>
+							</div>
+						</div>
+
+						<div style="font-size:36px; font-weight:bold; line-height:1;">
+							<?php echo round($currentTemp); ?>°C
+						</div>
+
+						<div style="font-size:13px; line-height:1.8;">
+							<strong><?php echo htmlspecialchars($currentWeather ?? ''); ?></strong><br>
+							Humidity: <?php echo htmlspecialchars($currentHumidity ?? ''); ?>%
+							&nbsp;|&nbsp;
+							Wind: <?php echo htmlspecialchars($currentWind ?? ''); ?> km/h
+						</div>
+
+						<div style="margin-left:auto; font-size:11px; opacity:0.6;">
+							Source: Open-Meteo
+						</div>
+
+					</div>
+
+					<?php endif; ?>
 
                     <!-- WARNINGS SECTION -->
                     <div id="warnings" class="warning-section">
-                        <div class="section-title">⚠ WATCHES, WARNINGS &amp; ADVISORIES — KLANG VALLEY</div>
+                        <div class="section-title">⚠ WATCHES, WARNINGS &amp; ADVISORIES — <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
                         <?php if ($warningData === null): ?>
                             <div class="error">ERROR: Unable to load warning data from MET Malaysia API</div>
-                        <?php elseif (empty($klangValleyWarnings)): ?>
-                            <div class="no-warnings">✓ NO ACTIVE WARNINGS OR ADVISORIES AFFECTING KLANG VALLEY AT THIS TIME</div>
+                        <?php elseif (empty($filteredWarnings)): ?>
+                            <div class="no-warnings">✓ NO ACTIVE WARNINGS OR ADVISORIES AFFECTING <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?> AT THIS TIME</div>
                         <?php else: ?>
                             <div class="update-time">
-                                <?php echo count($klangValleyWarnings); ?> active warning(s) affecting Klang Valley — click to expand
+                                <?php echo count($filteredWarnings); ?> active warning(s) — click to expand
                             </div>
-                            <?php foreach ($klangValleyWarnings as $i => $warning): ?>
+                            <?php foreach ($filteredWarnings as $i => $warning): ?>
                                 <?php
                                 $issued    = isset($warning['warning_issue']['issued']) ? date('D, M j, Y g:i A', strtotime($warning['warning_issue']['issued'])) : 'N/A';
                                 $validFrom = isset($warning['valid_from'])              ? date('D, M j, Y g:i A', strtotime($warning['valid_from']))              : 'N/A';
@@ -297,21 +473,34 @@ $currentTime = date('l, F j, Y g:i A');
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+                    
+                    <!-- RADAR MALAYSIA -->
+                    <div class="section" style="margin-bottom:20px;">
+                        <div class="section-title">🛰 RADAR MALAYSIA</div>
+                        <div style="border:1px solid #999;background:#000;overflow:hidden;">
+                            <img
+                                src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
+                                alt="Malaysia Weather Radar"
+                                style="display:block;width:100%;height:auto;"
+                            >
+                            <div style="background:#E8E8E8;border-top:1px solid #999;padding:5px 10px;font-size:11px;color:#444;">
+                                Komposit Radar Cuaca Malaysia &mdash;
+                                <a href="https://www.met.gov.my" target="_blank">MET Malaysia</a>
+                                &bull; <span >Dikemaskini setiap ~10 minit</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- FORECAST SECTION -->
                     <div id="forecast" class="section">
-                        <div class="section-title">7-DAY FORECAST - KLANG VALLEY</div>
+                        <div class="section-title">7-DAY FORECAST — <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
                         <?php if ($forecastData === null): ?>
                             <div class="error">ERROR: Unable to load forecast data from MET Malaysia API</div>
-                        <?php elseif (empty($forecastsByLocation)): ?>
-                            <div class="error">NO FORECAST DATA AVAILABLE FOR KLANG VALLEY</div>
+                        <?php elseif (empty($filteredForecasts)): ?>
+                            <div class="error">NO FORECAST DATA AVAILABLE FOR <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
                         <?php else: ?>
                             <div class="update-time">Forecast issued: Daily by MET Malaysia</div>
-                            <?php foreach ($forecastsByLocation as $location => $forecasts): ?>
-                                <?php $anchorId = 'loc-' . preg_replace('/[^a-z0-9]+/', '-', strtolower($location)); ?>
-                                <div class="location-header" id="<?php echo $anchorId; ?>">
-                                    <?php echo htmlspecialchars($location); ?>
-                                </div>
+                            <?php foreach ($filteredForecasts as $location => $forecasts): ?>
                                 <table>
                                     <thead>
                                         <tr>

@@ -9,6 +9,7 @@ body {
     font-size: 14px;
     background: #fff;
     color: #000;
+    overflow-x: hidden;
 }
 
 .header {
@@ -265,7 +266,13 @@ tr:nth-child(even) {
     gap: 20px;
 }
 
+.main-content {
+    min-width: 0;
+}
+
 .status-online  { color: #2E7D32; }
+
+
 .status-offline { color: #CC0000; }
 
 @media (max-width: 1024px) {

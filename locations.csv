@@ -87,77 +87,77 @@ District,Ds069,Kuantan,Pahang
 District,Ds070,Port Dickson,Negeri Sembilan
 District,Ds071,Bera,Pahang
 District,Ds072,Kuala Pilah,Negeri Sembilan
-District,Ds073,Rembau,
-District,Ds074,Jempol,
-District,Ds075,Alor Gajah,
-District,Ds076,Pekan,
-District,Ds077,Tampin,
+District,Ds073,Rembau,Negeri Sembilan
+District,Ds074,Jempol,Negeri Sembilan
+District,Ds075,Alor Gajah,Melaka
+District,Ds076,Pekan,Pahang
+District,Ds077,Tampin,Negeri Sembilan
 District,Ds078,Melaka Tengah,Melaka
-District,Ds079,Jasin,
-District,Ds080,Rompin,
-District,Ds081,Tangkak,
-District,Ds082,Segamat,
-District,Ds083,Muar,
-District,Ds084,Batu Pahat,
-District,Ds085,Kluang,
-District,Ds086,Mersing,
-District,Ds087,Pontian,
-District,Ds088,Kulai,
-District,Ds089,Kota Tinggi,
+District,Ds079,Jasin,Melaka
+District,Ds080,Rompin,Pahang
+District,Ds081,Tangkak,Johor
+District,Ds082,Segamat,Johor
+District,Ds083,Muar,Johor
+District,Ds084,Batu Pahat,Johor
+District,Ds085,Kluang,Johor
+District,Ds086,Mersing,Johor
+District,Ds087,Pontian,Johor
+District,Ds088,Kulai,Johor
+District,Ds089,Kota Tinggi,Johor
 District,Ds090,Johor Bahru,Johor
-District,Ds501,Tebedu,
-District,Ds502,Bau,
-District,Ds503,Lundu,
-District,Ds504,Kuching,
-District,Ds505,Serian,
-District,Ds506,Samarahan,
-District,Ds507,Asajaya,
-District,Ds508,Simunjan,
-District,Ds509,Sri Aman,
-District,Ds510,Pusa,
-District,Ds511,Betong,
-District,Ds512,Saratok,
-District,Ds513,Kabong,
-District,Ds514,Lubok Antu,
-District,Ds515,Pakan,
-District,Ds516,Sarikei,
-District,Ds517,Tanjung Manis,
-District,Ds518,Julau,
-District,Ds519,Meradong,
-District,Ds520,Daro,
-District,Ds521,Sibu,
-District,Ds522,Kanowit,
-District,Ds523,Song,
-District,Ds524,Matu,
-District,Ds525,Dalat,
-District,Ds526,Selangau,
-District,Ds527,Mukah,
-District,Ds528,Kapit,
-District,Ds529,Bukit Mabong,
-District,Ds530,Tatau,
-District,Ds531,Bintulu,
-District,Ds532,Sebauh,
-District,Ds533,Belaga,
-District,Ds534,Subis,
-District,Ds535,Beluru,
-District,Ds536,Telang Usan,
-District,Ds537,Miri,
-District,Ds538,Marudi,
-District,Ds539,Limbang,
-District,Ds540,Lawas,
-District,Ds541,Sipitang,
-District,Ds542,FP Labuan,
-District,Ds543,Tenom,
-District,Ds544,Kuala Penyu,
-District,Ds545,Beaufort,
-District,Ds546,Nabawan,
-District,Ds547,Keningau,
-District,Ds548,Papar,
-District,Ds549,Putatan,
-District,Ds550,Penampang,
-District,Ds551,Tambunan,
-District,Ds552,Tawau,
-District,Ds553,Tongod,
+District,Ds501,Tebedu,Sarawak
+District,Ds502,Bau,Sarawak
+District,Ds503,Lundu,Sarawak
+District,Ds504,Kuching,Sarawak
+District,Ds505,Serian,Sarawak
+District,Ds506,Samarahan,Sarawak
+District,Ds507,Asajaya,Sarawak
+District,Ds508,Simunjan,Sarawak
+District,Ds509,Sri Aman,Sarawak
+District,Ds510,Pusa,Sarawak
+District,Ds511,Betong,Sarawak
+District,Ds512,Saratok,Sarawak
+District,Ds513,Kabong,Sarawak
+District,Ds514,Lubok Antu,Sarawak
+District,Ds515,Pakan,Sarawak
+District,Ds516,Sarikei,Sarawak
+District,Ds517,Tanjung Manis,Sarawak
+District,Ds518,Julau,Sarawak
+District,Ds519,Meradong,Sarawak
+District,Ds520,Daro,Sarawak
+District,Ds521,Sibu,Sarawak
+District,Ds522,Kanowit,Sarawak
+District,Ds523,Song,Sarawak
+District,Ds524,Matu,Sarawak
+District,Ds525,Dalat,Sarawak
+District,Ds526,Selangau,Sarawak
+District,Ds527,Mukah,Sarawak
+District,Ds528,Kapit,Sarawak
+District,Ds529,Bukit Mabong,Sarawak
+District,Ds530,Tatau,Sarawak
+District,Ds531,Bintulu,Sarawak
+District,Ds532,Sebauh,Sarawak
+District,Ds533,Belaga,Sarawak
+District,Ds534,Subis,Sarawak
+District,Ds535,Beluru,Sarawak
+District,Ds536,Telang Usan,Sarawak
+District,Ds537,Miri,Sarawak
+District,Ds538,Marudi,Sarawak
+District,Ds539,Limbang,Sarawak
+District,Ds540,Lawas,Sarawak
+District,Ds541,Sipitang,Sabah
+District,Ds542,FP Labuan,WP Labuan
+District,Ds543,Tenom,Sabah
+District,Ds544,Kuala Penyu,Sabah
+District,Ds545,Beaufort,Sabah
+District,Ds546,Nabawan,Sabah
+District,Ds547,Keningau,Sabah
+District,Ds548,Papar,Sabah
+District,Ds549,Putatan,Sabah
+District,Ds550,Penampang,Sabah
+District,Ds551,Tambunan,Sabah
+District,Ds552,Tawau,Sabah
+District,Ds553,Tongod,Sabah
 Town,Tn001,Perlis,Perlis
 Town,Tn002,Jitra,Kedah
 Town,Tn003,Alor Star,Kedah
@@ -237,68 +237,68 @@ Town,Tn076,Petaling Jaya,WP Kuala Lumpur
 Town,Tn077,Subang Jaya,WP Kuala Lumpur
 Town,Tn078,Bangsar,Selangor
 Town,Tn079,Kuala Lumpur,WP Kuala Lumpur
-Town,Tn080,Bukit Bintang,
-Town,Tn081,Ampang,
-Town,Tn082,Dungun,
-Town,Tn083,Sungai Besi,
-Town,Tn084,Banting,
-Town,Tn085,Seri Kembangan,
-Town,Tn086,Cheras,
-Town,Tn087,Cyberjaya,
-Town,Tn088,Putrajaya,
-Town,Tn089,Paka,
-Town,Tn090,Kajang,
-Town,Tn091,Mentakab,
-Town,Tn092,Bangi,
-Town,Tn093,Semenyih,
-Town,Tn094,Kertih,
-Town,Tn095,Temerloh,
-Town,Tn096,Nilai,
-Town,Tn097,Sepang,
-Town,Tn098,Kemaman,
-Town,Tn099,Kuala Klawang,
-Town,Tn100,Jelebu,
-Town,Tn101,Triang,
-Town,Tn102,Bera,
-Town,Tn103,Maran,
-Town,Tn104,Seremban,
-Town,Tn105,Port Dickson,
-Town,Tn106,Kuala Pilah,
-Town,Tn107,Rembau,
-Town,Tn108,Kuantan,
-Town,Tn109,Jempol,
-Town,Tn110,Tampin,
-Town,Tn111,Masjid Tanah,
-Town,Tn112,Alor Gajah,
-Town,Tn113,Tangga Batu,
-Town,Tn114,Pekan,
-Town,Tn115,Durian Tunggal,
-Town,Tn116,Muadzam Shah,
-Town,Tn117,Gemas,
-Town,Tn118,Ayer Keroh,
+Town,Tn080,Bukit Bintang,WP Kuala Lumpur
+Town,Tn081,Ampang,Selangor
+Town,Tn082,Dungun,Terengganu
+Town,Tn083,Sungai Besi,WP Kuala Lumpur
+Town,Tn084,Banting,Selangor
+Town,Tn085,Seri Kembangan,Selangor
+Town,Tn086,Cheras,WP Kuala Lumpur
+Town,Tn087,Cyberjaya,Selangor
+Town,Tn088,Putrajaya,WP Putrajaya
+Town,Tn089,Paka,Terengganu
+Town,Tn090,Kajang,Selangor
+Town,Tn091,Mentakab,Pahang
+Town,Tn092,Bangi,Selangor
+Town,Tn093,Semenyih,Selangor
+Town,Tn094,Kertih,Terengganu
+Town,Tn095,Temerloh,Pahang
+Town,Tn096,Nilai,Negeri Sembilan
+Town,Tn097,Sepang,Selangor
+Town,Tn098,Kemaman,Terengganu
+Town,Tn099,Kuala Klawang,Negeri Sembilan
+Town,Tn100,Jelebu,Negeri Sembilan
+Town,Tn101,Triang,Pahang
+Town,Tn102,Bera,Pahang
+Town,Tn103,Maran,Pahang
+Town,Tn104,Seremban,Negeri Sembilan
+Town,Tn105,Port Dickson,Negeri Sembilan
+Town,Tn106,Kuala Pilah,Negeri Sembilan
+Town,Tn107,Rembau,Negeri Sembilan
+Town,Tn108,Kuantan,Pahang
+Town,Tn109,Jempol,Negeri Sembilan
+Town,Tn110,Tampin,Negeri Sembilan
+Town,Tn111,Masjid Tanah,Melaka
+Town,Tn112,Alor Gajah,Melaka
+Town,Tn113,Tangga Batu,Melaka
+Town,Tn114,Pekan,Pahang
+Town,Tn115,Durian Tunggal,Melaka
+Town,Tn116,Muadzam Shah,Pahang
+Town,Tn117,Gemas,Negeri Sembilan
+Town,Tn118,Ayer Keroh,Melaka
 Town,Tn119,Bandaraya Melaka,Melaka
-Town,Tn120,Jasin,
-Town,Tn121,Tangkak,
-Town,Tn122,Merlimau,
-Town,Tn123,Segamat,
-Town,Tn124,Muar,
-Town,Tn125,Pagoh,
-Town,Tn126,Labis,
-Town,Tn127,Kuala Rompin,
-Town,Tn128,Yong Peng,
-Town,Tn129,Batu Pahat,
-Town,Tn130,Ayer Hitam,
-Town,Tn131,Kluang,
-Town,Tn132,Mersing,
-Town,Tn133,Simpang Renggam,
-Town,Tn134,Pontian,
-Town,Tn135,Kulai,
-Town,Tn136,Senai,
-Town,Tn137,Kota Tinggi,
-Town,Tn138,Iskandar Puteri,
+Town,Tn120,Jasin,Melaka
+Town,Tn121,Tangkak,Johor
+Town,Tn122,Merlimau,Melaka
+Town,Tn123,Segamat,Johor
+Town,Tn124,Muar,Johor
+Town,Tn125,Pagoh,Johor
+Town,Tn126,Labis,Johor
+Town,Tn127,Kuala Rompin,Pahang
+Town,Tn128,Yong Peng,Johor
+Town,Tn129,Batu Pahat,Johor
+Town,Tn130,Ayer Hitam,Johor
+Town,Tn131,Kluang,Johor
+Town,Tn132,Mersing,Johor
+Town,Tn133,Simpang Renggam,Johor
+Town,Tn134,Pontian,Johor
+Town,Tn135,Kulai,Johor
+Town,Tn136,Senai,Johor
+Town,Tn137,Kota Tinggi,Johor
+Town,Tn138,Iskandar Puteri,Johor
 Town,Tn139,Johor Bahru,Johor
-Town,Tn140,Pasir Gudang,
-Town,Tn141,Lojing,
+Town,Tn140,Pasir Gudang,Johor
+Town,Tn141,Lojing,Kelantan
 Division,Dv501,Kuching,Sarawak
 Division,Dv502,Serian,Sarawak
 Division,Dv503,Samarahan,Sarawak

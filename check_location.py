@@ -88,6 +88,57 @@ STATE_MAP = {
     "Rc022": "Terengganu",      "Rc023": "Pahang",          "Rc024": "Pahang",
     "Rc025": "Johor",           "Rc026": "Johor",
     "Rc501": "Sabah",           "Rc502": "Sabah",
+    # Districts — Negeri Sembilan, Melaka, Johor (Peninsular)
+    "Ds073": "Negeri Sembilan", "Ds074": "Negeri Sembilan", "Ds075": "Melaka",
+    "Ds076": "Pahang",          "Ds077": "Negeri Sembilan", "Ds079": "Melaka",
+    "Ds080": "Pahang",          "Ds081": "Johor",           "Ds082": "Johor",
+    "Ds083": "Johor",           "Ds084": "Johor",           "Ds085": "Johor",
+    "Ds086": "Johor",           "Ds087": "Johor",           "Ds088": "Johor",
+    "Ds089": "Johor",
+    # Districts — Sarawak
+    "Ds501": "Sarawak",  "Ds502": "Sarawak",  "Ds503": "Sarawak",  "Ds504": "Sarawak",
+    "Ds505": "Sarawak",  "Ds506": "Sarawak",  "Ds507": "Sarawak",  "Ds508": "Sarawak",
+    "Ds509": "Sarawak",  "Ds510": "Sarawak",  "Ds511": "Sarawak",  "Ds512": "Sarawak",
+    "Ds513": "Sarawak",  "Ds514": "Sarawak",  "Ds515": "Sarawak",  "Ds516": "Sarawak",
+    "Ds517": "Sarawak",  "Ds518": "Sarawak",  "Ds519": "Sarawak",  "Ds520": "Sarawak",
+    "Ds521": "Sarawak",  "Ds522": "Sarawak",  "Ds523": "Sarawak",  "Ds524": "Sarawak",
+    "Ds525": "Sarawak",  "Ds526": "Sarawak",  "Ds527": "Sarawak",  "Ds528": "Sarawak",
+    "Ds529": "Sarawak",  "Ds530": "Sarawak",  "Ds531": "Sarawak",  "Ds532": "Sarawak",
+    "Ds533": "Sarawak",  "Ds534": "Sarawak",  "Ds535": "Sarawak",  "Ds536": "Sarawak",
+    "Ds537": "Sarawak",  "Ds538": "Sarawak",  "Ds539": "Sarawak",  "Ds540": "Sarawak",
+    # Districts — Sabah + Labuan
+    "Ds541": "Sabah",    "Ds542": "WP Labuan", "Ds543": "Sabah",   "Ds544": "Sabah",
+    "Ds545": "Sabah",    "Ds546": "Sabah",     "Ds547": "Sabah",   "Ds548": "Sabah",
+    "Ds549": "Sabah",    "Ds550": "Sabah",     "Ds551": "Sabah",   "Ds552": "Sabah",
+    "Ds553": "Sabah",
+    # Towns — KL / Selangor
+    "Tn080": "WP Kuala Lumpur", "Tn081": "Selangor",        "Tn083": "WP Kuala Lumpur",
+    "Tn084": "Selangor",        "Tn085": "Selangor",        "Tn086": "WP Kuala Lumpur",
+    "Tn087": "Selangor",        "Tn088": "WP Putrajaya",    "Tn090": "Selangor",
+    "Tn092": "Selangor",        "Tn093": "Selangor",        "Tn097": "Selangor",
+    # Towns — Terengganu
+    "Tn082": "Terengganu",      "Tn089": "Terengganu",      "Tn094": "Terengganu",
+    "Tn098": "Terengganu",
+    # Towns — Pahang
+    "Tn091": "Pahang",  "Tn095": "Pahang",  "Tn101": "Pahang",  "Tn102": "Pahang",
+    "Tn103": "Pahang",  "Tn108": "Pahang",  "Tn114": "Pahang",  "Tn116": "Pahang",
+    "Tn127": "Pahang",
+    # Towns — Negeri Sembilan
+    "Tn096": "Negeri Sembilan", "Tn099": "Negeri Sembilan", "Tn100": "Negeri Sembilan",
+    "Tn104": "Negeri Sembilan", "Tn105": "Negeri Sembilan", "Tn106": "Negeri Sembilan",
+    "Tn107": "Negeri Sembilan", "Tn109": "Negeri Sembilan", "Tn110": "Negeri Sembilan",
+    "Tn117": "Negeri Sembilan",
+    # Towns — Melaka
+    "Tn111": "Melaka",  "Tn112": "Melaka",  "Tn113": "Melaka",  "Tn115": "Melaka",
+    "Tn118": "Melaka",  "Tn120": "Melaka",  "Tn122": "Melaka",
+    # Towns — Johor
+    "Tn121": "Johor",   "Tn123": "Johor",   "Tn124": "Johor",   "Tn125": "Johor",
+    "Tn126": "Johor",   "Tn128": "Johor",   "Tn129": "Johor",   "Tn130": "Johor",
+    "Tn131": "Johor",   "Tn132": "Johor",   "Tn133": "Johor",   "Tn134": "Johor",
+    "Tn135": "Johor",   "Tn136": "Johor",   "Tn137": "Johor",   "Tn138": "Johor",
+    "Tn140": "Johor",
+    # Towns — Kelantan
+    "Tn141": "Kelantan",
 }
 
 # Infer state for IDs not in STATE_MAP (new additions from API)
