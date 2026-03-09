@@ -5,7 +5,6 @@ ini_set('display_errors', 1);
 // API endpoints
 $forecastApiUrl   = "https://api.data.gov.my/weather/forecast/";
 $warningApiUrl    = "https://api.data.gov.my/weather/warning/";
-$earthquakeApiUrl = "https://api.data.gov.my/weather/warning/earthquake";
 
 // Klang Valley states (only config needed — town names come from locations.csv)
 $klangValleyStates = ['Selangor', 'WP Kuala Lumpur', 'WP Putrajaya'];
@@ -125,6 +124,7 @@ if ($rawOcr) {
 }
 
 
+
 // Map forecast text to emoji
 function weatherEmoji($text) {
     $t = strtolower($text);
@@ -141,16 +141,6 @@ function weatherEmoji($text) {
 // Fetch all data
 $forecastData      = fetchData($forecastApiUrl);
 $warningData       = fetchData($warningApiUrl);
-$earthquakeDataRaw = fetchData($earthquakeApiUrl);
-
-// Sort earthquakes by date (newest first) and get latest 10
-$earthquakeData = [];
-if ($earthquakeDataRaw) {
-    usort($earthquakeDataRaw, function($a, $b) {
-        return strtotime($b['localdatetime']) - strtotime($a['localdatetime']);
-    });
-    $earthquakeData = array_slice($earthquakeDataRaw, 0, 10);
-}
 
 // Filter forecasts for Klang Valley towns (Tn prefix only)
 $klangValleyForecasts = [];
@@ -247,6 +237,7 @@ if ($warningData) {
 
 // Fetch current conditions from Open-Meteo (free, no key)
 $currentTemp = $currentWeather = $currentHumidity = $currentWind = null;
+$currentFeelsLike = $currentDewpoint = $currentPrecip = $currentCloud = $currentPressure = $currentVisibility = $currentWindDir = null;
 $coords = null;
 foreach ($townCoords as $town => $c) {
     if (stripos($selectedLocation, $town) !== false || stripos($town, $selectedLocation) !== false) {
@@ -254,25 +245,37 @@ foreach ($townCoords as $town => $c) {
     }
 }
 if ($coords) {
-$meteoUrl  = "https://api.open-meteo.com/v1/forecast?latitude={$coords['lat']}&longitude={$coords['lon']}"
-           . "&current=temperature_2m,relative_humidity_2m,weathercode,windspeed_10m"
-           . "&timezone=Asia%2FKuala_Lumpur";
-$meteoData = fetchData($meteoUrl);
-if ($meteoData && isset($meteoData['current'])) {
-    $currentTemp     = $meteoData['current']['temperature_2m'] ?? null;
-    $currentHumidity = $meteoData['current']['relative_humidity_2m'] ?? null;
-    $currentWind     = $meteoData['current']['windspeed_10m'] ?? null;
-    $wmoCodes = [
-        0=>'Clear Sky', 1=>'Mainly Clear', 2=>'Partly Cloudy', 3=>'Overcast',
-        45=>'Foggy', 48=>'Icy Fog',
-        51=>'Light Drizzle', 53=>'Drizzle', 55=>'Heavy Drizzle',
-        61=>'Light Rain', 63=>'Rain', 65=>'Heavy Rain',
-        80=>'Rain Showers', 81=>'Heavy Showers', 82=>'Violent Showers',
-        95=>'Thunderstorm', 96=>'Thunderstorm w/ Hail', 99=>'Heavy Thunderstorm',
-    ];
-    $wcode          = $meteoData['current']['weathercode'] ?? null;
-    $currentWeather = $wmoCodes[$wcode] ?? 'Unknown';
+    $meteoUrl  = "https://api.open-meteo.com/v1/forecast?latitude={$coords['lat']}&longitude={$coords['lon']}"
+               . "&current=temperature_2m,relative_humidity_2m,weathercode,windspeed_10m,winddirection_10m,apparent_temperature,dewpoint_2m,precipitation,cloudcover,surface_pressure,visibility"
+               . "&timezone=Asia%2FKuala_Lumpur";
+    $meteoData = fetchData($meteoUrl);
+    if ($meteoData && isset($meteoData['current'])) {
+        $currentTemp        = $meteoData['current']['temperature_2m'] ?? null;
+        $currentHumidity    = $meteoData['current']['relative_humidity_2m'] ?? null;
+        $currentWind        = $meteoData['current']['windspeed_10m'] ?? null;
+        $currentWindDir     = $meteoData['current']['winddirection_10m'] ?? null;
+        $currentFeelsLike   = $meteoData['current']['apparent_temperature'] ?? null;
+        $currentDewpoint    = $meteoData['current']['dewpoint_2m'] ?? null;
+        $currentPrecip      = $meteoData['current']['precipitation'] ?? null;
+        $currentCloud       = $meteoData['current']['cloudcover'] ?? null;
+        $currentPressure    = $meteoData['current']['surface_pressure'] ?? null;
+        $currentVisibility  = $meteoData['current']['visibility'] ?? null;
+        $wmoCodes = [
+            0=>'Clear Sky', 1=>'Mainly Clear', 2=>'Partly Cloudy', 3=>'Overcast',
+            45=>'Foggy', 48=>'Icy Fog',
+            51=>'Light Drizzle', 53=>'Drizzle', 55=>'Heavy Drizzle',
+            61=>'Light Rain', 63=>'Rain', 65=>'Heavy Rain',
+            80=>'Rain Showers', 81=>'Heavy Showers', 82=>'Violent Showers',
+            95=>'Thunderstorm', 96=>'Thunderstorm w/ Hail', 99=>'Heavy Thunderstorm',
+        ];
+        $wcode          = $meteoData['current']['weathercode'] ?? null;
+        $currentWeather = $wmoCodes[$wcode] ?? 'Unknown';
     }
+}
+function windDirCompass($deg) {
+    if ($deg === null) return '';
+    $dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    return $dirs[round($deg / 22.5) % 16];
 }
 
 // Keywords from CSV: all Klang Valley location names + state names
@@ -309,55 +312,38 @@ $currentTime = date('l, F j, Y g:i A');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Weather Service Malaysia - Klang Valley</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .warning-header {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            user-select: none;
-        }
-        .warning-header:hover { opacity: 0.85; }
-        .warning-toggle {
-            font-size: 12px;
-            flex-shrink: 0;
-            margin-left: 10px;
-            transition: transform 0.2s;
-        }
-        .warning-toggle.open { transform: rotate(180deg); }
-        .warning-body { display: none; margin-top: 10px; }
-        .warning-body.open { display: block; }
-    </style>
 </head>
 <body>
     <div class="header">
         <div class="container">
-            <a href="/" style="text-decoration:none;color:white;display:inline-flex;align-items:center;gap:14px;">
+            <a href="/" class="header-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="22" r="10" fill="#FFD54F"/><line x1="32" y1="4" x2="32" y2="10" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="34" x2="32" y2="40" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="20" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="22" x2="50" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="8" x2="22" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="32" x2="46" y2="36" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="8" x2="42" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="36" x2="22" y2="32" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><rect x="8" y="36" width="48" height="18" rx="9" fill="white" opacity="0.95"/><circle cx="20" cy="36" r="9" fill="white" opacity="0.95"/><circle cx="36" cy="32" r="12" fill="white" opacity="0.95"/><circle cx="50" cy="37" r="7" fill="white" opacity="0.95"/></svg>
                 <div>
-                    <div style="font-size:22px;font-weight:bold;letter-spacing:1px;">Cuaca Lembah Klang</div>
-                    <div style="font-size:12px;opacity:0.75;letter-spacing:2px;">PERKHIDMATAN RAMALAN CUACA</div>
+                    <div class="header-title">Cuaca Lembah Klang</div>
+                    <div class="header-subtitle">PERKHIDMATAN RAMALAN CUACA</div>
                 </div>
             </a>
         </div>
     </div>
 
     <div class="nav">
-        <div class="container" style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
-            <form method="get" action="" style="display:flex; align-items:center; gap:8px; margin:0;">
-                <label for="loc-select" style="font-size:13px; font-weight:bold; color:#333;">KAWASAN:</label>
-                <select id="loc-select" name="location" onchange="this.form.submit();" style="font-size:13px; padding:3px 6px; border:1px solid #aaa; background:#fff;">
-                    <option value="" <?php echo ($selectedLocation === '') ? 'selected' : ''; ?>>— Semua Kawasan —</option>
-                    <?php foreach ($allLocationNames as $name): ?>
-                    <option value="<?php echo htmlspecialchars($name); ?>" <?php echo ($name === $selectedLocation) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($name); ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
-            <a href="#warnings" style="color:#3F51B5; text-decoration:none; font-size:13px;">CURRENT HAZARDS</a>
-            <a href="#forecast" style="color:#3F51B5; text-decoration:none; font-size:13px;">FORECAST</a>
-        </div>
+		<div class="container">
+			<div class="nav-inner">
+				<form method="get" action="" class="nav-form">
+					<label for="loc-select" class="nav-label">KAWASAN:</label>
+					<select id="loc-select" name="location" onchange="this.form.submit();" class="nav-select">
+						<option value="" <?php echo ($selectedLocation === '') ? 'selected' : ''; ?>>— Semua Kawasan —</option>
+						<?php foreach ($allLocationNames as $name): ?>
+						<option value="<?php echo htmlspecialchars($name); ?>" <?php echo ($name === $selectedLocation) ? 'selected' : ''; ?>>
+							<?php echo htmlspecialchars($name); ?>
+						</option>
+						<?php endforeach; ?>
+					</select>
+				</form>
+				<a href="#warnings">CURRENT HAZARDS</a>
+				<a href="#forecast">FORECAST</a>
+			</div>
+		</div>
     </div>
 
     <div class="container">
@@ -395,28 +381,47 @@ $currentTime = date('l, F j, Y g:i A');
 					}
 					?>
 
-					<div style="background:#1A237E; color:#fff; padding:12px 16px; margin-bottom:20px; display:flex; align-items:center; gap:30px; flex-wrap:wrap;">
-						
-						<div>
-							<div style="font-size:11px; text-transform:uppercase; opacity:0.7;">Current Conditions</div>
-							<div style="font-size:13px; font-weight:bold;">
-								<?php echo htmlspecialchars($displayLocation); ?>
-							</div>
+					<div class="current-conditions">
+
+						<!-- Left: big temp + condition -->
+						<div class="conditions-left">
+							<div class="conditions-label">Current Conditions</div>
+							<div class="conditions-location"><?php echo htmlspecialchars($displayLocation); ?></div>
+							<div class="conditions-temp"><?php echo round($currentTemp); ?>°C</div>
+							<div class="conditions-weather"><?php echo htmlspecialchars($currentWeather ?? ''); ?></div>
 						</div>
 
-						<div style="font-size:36px; font-weight:bold; line-height:1;">
-							<?php echo round($currentTemp); ?>°C
-						</div>
-
-						<div style="font-size:13px; line-height:1.8;">
-							<strong><?php echo htmlspecialchars($currentWeather ?? ''); ?></strong><br>
-							Humidity: <?php echo htmlspecialchars($currentHumidity ?? ''); ?>%
-							&nbsp;|&nbsp;
-							Wind: <?php echo htmlspecialchars($currentWind ?? ''); ?> km/h
-						</div>
-
-						<div style="margin-left:auto; font-size:11px; opacity:0.6;">
-							Source: Open-Meteo
+						<!-- Right: detail table -->
+						<div class="conditions-right">
+							<table class="conditions-table">
+								<tr>
+									<td class="lbl">Humidity</td>
+									<td><?php echo $currentHumidity ?? 'N/A'; ?>%</td>
+									<td class="lbl2">Dew Point</td>
+									<td><?php echo $currentDewpoint !== null ? round($currentDewpoint).'°C' : 'N/A'; ?></td>
+								</tr>
+								<tr>
+									<td class="lbl">Wind</td>
+									<td><?php echo $currentWind !== null ? $currentWind.' km/h '.windDirCompass($currentWindDir) : 'N/A'; ?></td>
+									<td class="lbl2">Feels Like</td>
+									<td><?php echo $currentFeelsLike !== null ? round($currentFeelsLike).'°C' : 'N/A'; ?></td>
+								</tr>
+								<tr>
+									<td class="lbl">Pressure</td>
+									<td><?php echo $currentPressure !== null ? round($currentPressure).' hPa' : 'N/A'; ?></td>
+									<td class="lbl2">Visibility</td>
+									<td><?php echo $currentVisibility !== null ? round($currentVisibility/1000,1).' km' : 'N/A'; ?></td>
+								</tr>
+								<tr>
+									<td class="lbl">Precipitation</td>
+									<td><?php echo $currentPrecip !== null ? $currentPrecip.' mm' : 'N/A'; ?></td>
+									<td class="lbl2">Cloud Cover</td>
+									<td><?php echo $currentCloud !== null ? $currentCloud.'%' : 'N/A'; ?></td>
+								</tr>
+								<tr>
+									<td colspan="4" class="conditions-source">Source: Open-Meteo</td>
+								</tr>
+							</table>
 						</div>
 
 					</div>
@@ -425,11 +430,11 @@ $currentTime = date('l, F j, Y g:i A');
 
                     <!-- WARNINGS SECTION -->
                     <div id="warnings" class="warning-section">
-                        <div class="section-title">⚠ WATCHES, WARNINGS &amp; ADVISORIES — <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
+                        <div class="section-title">WATCHES, WARNINGS &amp; ADVISORIES<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
                         <?php if ($warningData === null): ?>
                             <div class="error">ERROR: Unable to load warning data from MET Malaysia API</div>
                         <?php elseif (empty($filteredWarnings)): ?>
-                            <div class="no-warnings">✓ NO ACTIVE WARNINGS OR ADVISORIES AFFECTING <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?> AT THIS TIME</div>
+                            <div class="no-warnings">&#10003; NO ACTIVE WARNINGS OR ADVISORIES<?php echo $selectedLocation ? ' AFFECTING ' . htmlspecialchars(strtoupper($selectedLocation)) : ' FOR KLANG VALLEY'; ?> AT THIS TIME</div>
                         <?php else: ?>
                             <div class="update-time">
                                 <?php echo count($filteredWarnings); ?> active warning(s) — click to expand
@@ -455,7 +460,7 @@ $currentTime = date('l, F j, Y g:i A');
                                             <strong>VALID TO:</strong> <?php echo $validTo; ?>
                                         </div>
                                         <?php if (!empty($warning['heading_en'])): ?>
-                                            <div style="font-weight:bold; margin:10px 0;">
+                                            <div class="warning-heading">
                                                 <?php echo htmlspecialchars($warning['heading_en']); ?>
                                             </div>
                                         <?php endif; ?>
@@ -475,25 +480,23 @@ $currentTime = date('l, F j, Y g:i A');
                     </div>
                     
                     <!-- RADAR MALAYSIA -->
-                    <div class="section" style="margin-bottom:20px;">
-                        <div class="section-title">🛰 RADAR MALAYSIA</div>
-                        <div style="border:1px solid #999;background:#000;overflow:hidden;">
-                            <img
-                                src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
-                                alt="Malaysia Weather Radar"
-                                style="display:block;width:100%;height:auto;"
-                            >
-                            <div style="background:#E8E8E8;border-top:1px solid #999;padding:5px 10px;font-size:11px;color:#444;">
+                    <div class="section">
+                        <div class="section-title">RADAR MALAYSIA</div>
+                        <div class="radar-wrap">
+                            <img src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
+                                 alt="Malaysia Weather Radar"
+                                 class="radar-img">
+                            <div class="radar-caption">
                                 Komposit Radar Cuaca Malaysia &mdash;
                                 <a href="https://www.met.gov.my" target="_blank">MET Malaysia</a>
-                                &bull; <span >Dikemaskini setiap ~10 minit</span>
+                                &bull; Dikemaskini setiap ~10 minit
                             </div>
                         </div>
                     </div>
 
                     <!-- FORECAST SECTION -->
                     <div id="forecast" class="section">
-                        <div class="section-title">7-DAY FORECAST — <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
+                        <div class="section-title">7-DAY FORECAST<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
                         <?php if ($forecastData === null): ?>
                             <div class="error">ERROR: Unable to load forecast data from MET Malaysia API</div>
                         <?php elseif (empty($filteredForecasts)): ?>
@@ -501,6 +504,9 @@ $currentTime = date('l, F j, Y g:i A');
                         <?php else: ?>
                             <div class="update-time">Forecast issued: Daily by MET Malaysia</div>
                             <?php foreach ($filteredForecasts as $location => $forecasts): ?>
+                                <div class="location-header" id="<?php echo $locationAnchors[$location] ?? ''; ?>">
+                                    <?php echo htmlspecialchars($location); ?>
+                                </div>
                                 <table>
                                     <thead>
                                         <tr>
@@ -521,11 +527,12 @@ $currentTime = date('l, F j, Y g:i A');
                                         ?>
                                         <tr>
                                             <td><strong><?php echo date('D, M j', strtotime($forecast['date'])); ?></strong></td>
-                                            <td><?php echo weatherEmoji($forecast['morning_forecast'])   . ' ' . htmlspecialchars($forecast['morning_forecast']); ?></td>
-                                            <td><?php echo weatherEmoji($forecast['afternoon_forecast']) . ' ' . htmlspecialchars($forecast['afternoon_forecast']); ?></td>
-                                            <td><?php echo weatherEmoji($forecast['night_forecast'])     . ' ' . htmlspecialchars($forecast['night_forecast']); ?></td>
+                                            <td><?php $e = weatherEmoji($forecast['morning_forecast']); echo ($e ? $e.' ' : '') . htmlspecialchars($forecast['morning_forecast']); ?></td>
+                                            <td><?php $e = weatherEmoji($forecast['afternoon_forecast']); echo ($e ? $e.' ' : '') . htmlspecialchars($forecast['afternoon_forecast']); ?></td>
+                                            <td><?php $e = weatherEmoji($forecast['night_forecast']); echo ($e ? $e.' ' : '') . htmlspecialchars($forecast['night_forecast']); ?></td>
                                             <td>
-                                                <strong><?php echo weatherEmoji($forecast['summary_forecast']) . ' ' . htmlspecialchars($forecast['summary_forecast']); ?></strong><br>
+                                                <?php $e = weatherEmoji($forecast['summary_forecast']); ?>
+                                                <strong><?php echo ($e ? $e.' ' : '') . htmlspecialchars($forecast['summary_forecast']); ?></strong><br>
                                                 <small>(<?php echo htmlspecialchars($forecast['summary_when']); ?>)</small>
                                             </td>
                                             <td class="temp-data">
@@ -540,55 +547,30 @@ $currentTime = date('l, F j, Y g:i A');
                         <?php endif; ?>
                     </div>
 
-                    <?php /* EARTHQUAKE SECTION — commented out
-                    <div id="earthquake" class="section">
-                        <div class="section-title">RECENT EARTHQUAKE ACTIVITY</div>
-                        <?php if ($earthquakeData === null): ?>
-                            <div class="error">ERROR: Unable to load earthquake data from MET Malaysia API</div>
-                        <?php elseif (empty($earthquakeData)): ?>
-                            <div style="padding: 15px;">No recent earthquake activity reported</div>
-                        <?php else: ?>
-                            <div class="update-time">Recent earthquake events (Updated when required)</div>
-                            <table class="earthquake-table">
-                                <thead>
-                                    <tr>
-                                        <th>DATE/TIME (LOCAL)</th>
-                                        <th>MAGNITUDE</th>
-                                        <th>DEPTH</th>
-                                        <th>LOCATION</th>
-                                        <th>DISTANCE FROM MALAYSIA</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    foreach ($earthquakeData as $eq):
-                                        $mag       = $eq['magdefault'] ?? 0;
-                                        $magClass  = $mag >= 6.0 ? 'mag-high' : ($mag >= 5.0 ? 'mag-medium' : '');
-                                        $localTime = isset($eq['localdatetime']) ? date('l, M j, Y g:i A', strtotime($eq['localdatetime'])) : 'N/A';
-                                        <tr>
-                                            <td>$localTime</td>
-                                            <td class="magnitude $magClass">$mag magtypedefault</td>
-                                            <td>depth km</td>
-                                            <td><strong>location</strong><br>location_original<br>lat, lon</td>
-                                            <td><strong>Malaysia:</strong> nbm_distancemas<br><strong>Other:</strong> nbm_distancerest</td>
-                                        </tr>
-                                    endforeach
-                                </tbody>
-                            </table>
-                        endif
-                    </div>
-                    */ ?>
+
 
                 </div>
 
                 <div class="sidebar">
 
-                    <div class="info-box">
-                        <h3>DATA SOURCE</h3>
-                        <p>Malaysian Meteorological Department (MET Malaysia)</p>
-                        <p style="margin-top: 8px; font-size: 12px;">
-                            <strong>Page loaded:</strong><br><?php echo $currentTime; ?>
-                        </p>
+                    <!-- MET WARNING MAPS -->
+                    <?php
+                    $warningMaps = [
+                        ['url' => 'https://www.met.gov.my/data/AmaranHujanLebat.jpg',      'label' => 'Amaran Hujan Lebat'],
+                        ['url' => 'https://www.met.gov.my/data/AmaranRibutPetir.jpg',      'label' => 'Amaran Ribut Petir'],
+                        ['url' => 'https://www.met.gov.my/data/AmaranAnginKencangLaut.jpg', 'label' => 'Amaran Angin Kencang Laut'],
+                    ];
+                    foreach ($warningMaps as $map):
+                    ?>
+                    <div class="warning-map-box">
+                        <div class="warning-map-title"><?php echo htmlspecialchars($map['label']); ?></div>
+                        <a href="<?php echo $map['url']; ?>" target="_blank">
+                            <img src="<?php echo $map['url']; ?>?<?php echo time(); ?>"
+                                 alt="<?php echo htmlspecialchars($map['label']); ?>"
+                                 loading="lazy">
+                        </a>
                     </div>
+                    <?php endforeach; ?>
 
                     <div class="info-box">
                         <h3>API STATUS</h3>
@@ -600,21 +582,19 @@ $currentTime = date('l, F j, Y g:i A');
                             <strong>Warnings:</strong>
                             <span class="<?php echo $warningData    ? 'status-online' : 'status-offline'; ?>">
                                 <?php echo $warningData    ? '✓ Online' : '✗ Error'; ?>
-                            </span><br>
-                            <strong>Earthquake:</strong>
-                            <span class="<?php echo $earthquakeData ? 'status-online' : 'status-offline'; ?>">
-                                <?php echo $earthquakeData ? '✓ Online' : '✗ Error'; ?>
                             </span>
                         </p>
+                        <p class="api-updated">Updated: <?php echo $currentTime; ?></p>
                     </div>
 
                     <div class="info-box">
                         <h3>QUICK LINKS</h3>
-                        <ul style="list-style: none; margin-left: 0;">
+                        <ul>
+                            <li><a href="https://www.met.gov.my/pencerapan/nowcasting/" target="_blank">Nowcasting</a></li>
+                            <li><a href="https://www.met.gov.my/iklim/status-cuaca-panas/" target="_blank">Status Cuaca Panas</a></li>
                             <li><a href="https://www.met.gov.my/data/pocgn/ramalancuacakhas_bm.pdf" target="_blank">Ramalan Cuaca Khas</a></li>
                             <li><a href="<?php echo $forecastApiUrl; ?>" target="_blank">Raw Forecast Data</a></li>
                             <li><a href="<?php echo $warningApiUrl; ?>" target="_blank">Raw Warning Data</a></li>
-                            <li><a href="<?php echo $earthquakeApiUrl; ?>" target="_blank">Raw Earthquake Data</a></li>
                         </ul>
                     </div>
                 </div>
