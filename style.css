@@ -8,16 +8,17 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
     background: #fff;
-    color: #000;
+    color: #1b2d3e;
     overflow-x: hidden;
 }
 
 /* === HEADER === */
 .header {
-    background: #3F51B5;
+    background: #1b3958;
     color: white;
     padding: 10px 20px;
-    border-bottom: 3px solid #303F9F;
+    border-bottom: 3px solid #2e6195;
+    position: relative;
 }
 
 .header-link {
@@ -40,18 +41,33 @@ body {
     letter-spacing: 2px;
 }
 
-/* === NAV === */
+.prototype-badge {
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    background: #a9c25d;
+    color: #1b2d3e;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 8px;
+    letter-spacing: 1px;
+    border-radius: 2px;
+}
+
+/* === SUB-NAV === */
 .nav {
-    background: #E8E8E8;
-    border-bottom: 1px solid #ccc;
-    padding: 5px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #ddd;
+    padding: 0 5px;
+    overflow-x: auto;
 }
 
 .nav-inner {
     display: flex;
     align-items: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 4px;
+    flex-wrap: nowrap;
+    min-height: 34px;
 }
 
 .nav-form {
@@ -59,12 +75,14 @@ body {
     align-items: center;
     gap: 8px;
     margin: 0;
+    padding: 4px 10px 4px 4px;
 }
 
 .nav-label {
     font-size: 13px;
     font-weight: bold;
     color: #333;
+    white-space: nowrap;
 }
 
 .nav-select {
@@ -75,13 +93,24 @@ body {
 }
 
 .nav a {
-    color: #3F51B5;
+    color: #1b3958;
     text-decoration: none;
     font-size: 13px;
+    white-space: nowrap;
+    padding: 4px 12px;
 }
 
 .nav a:hover {
     text-decoration: underline;
+    background: #e8e8e8;
+}
+
+.nav-item {
+    color: #777;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: default;
+    padding: 4px 12px;
 }
 
 /* === CONTAINER === */
@@ -101,7 +130,7 @@ body {
 }
 
 .advisory-topbar-icon {
-    background: #135997;
+    background: #2e6195;
     width: 70px;
     min-width: 70px;
     display: flex;
@@ -153,7 +182,7 @@ body {
 
 /* === CURRENT CONDITIONS === */
 .current-conditions {
-    background: #1A237E;
+    background: #1b3958;
     color: #fff;
     padding: 12px 16px;
     margin-bottom: 20px;
@@ -337,7 +366,7 @@ body {
 }
 
 .radar-caption a {
-    color: #3F51B5;
+    color: #1b3958;
     text-decoration: none;
 }
 
@@ -349,7 +378,7 @@ body {
 }
 
 .section-title {
-    background: #3F51B5;
+    background: #1b3958;
     color: white;
     padding: 8px 12px;
     font-size: 16px;
@@ -402,13 +431,6 @@ tr:nth-child(even) { background: #F5F5F5; }
 .temp-low  { color: #0066CC; }
 
 /* === MISC === */
-.update-time {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 15px;
-    font-style: italic;
-}
-
 .error {
     background: #FFCCCC;
     border: 2px solid #CC0000;
@@ -429,38 +451,6 @@ tr:nth-child(even) { background: #F5F5F5; }
 }
 
 /* === SIDEBAR === */
-.info-box {
-    background: #F0F0F0;
-    border: 1px solid #999;
-    padding: 12px;
-    margin-bottom: 15px;
-}
-
-.info-box h3 {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #3F51B5;
-}
-
-.info-box ul {
-    list-style: none;
-    margin-left: 0;
-    line-height: 1.8;
-}
-
-.info-box a {
-    color: #3F51B5;
-    text-decoration: none;
-}
-
-.info-box a:hover { text-decoration: underline; }
-
-.api-updated {
-    margin-top: 8px;
-    font-size: 11px;
-    color: #555;
-}
-
 .status-online  { color: #2E7D32; }
 .status-offline { color: #CC0000; }
 
@@ -472,7 +462,7 @@ tr:nth-child(even) { background: #F5F5F5; }
 }
 
 .warning-map-title {
-    background: #3F51B5;
+    background: #1b3958;
     color: #fff;
     font-size: 12px;
     font-weight: bold;
@@ -487,6 +477,64 @@ tr:nth-child(even) { background: #F5F5F5; }
     display: block;
     width: 100%;
     height: auto;
+}
+
+/* === FOOTER === */
+.footer {
+    background: #f5f5f5;
+    border-top: 2px solid #1b3958;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #444;
+}
+
+.footer-wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    gap: 0;
+}
+
+.footer-wrap > div {
+    flex: 1;
+    padding: 0 16px;
+    border-right: 1px solid #ddd;
+    line-height: 1.8;
+}
+
+.footer-wrap > div:first-child {
+    padding-left: 0;
+}
+
+.footer-wrap > div:last-child {
+    border-right: none;
+}
+
+.footer-social {
+    display: flex;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: #1b3958;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.footer a {
+    color: #1b3958;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 1024px) {

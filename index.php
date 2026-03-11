@@ -261,15 +261,15 @@ if ($coords) {
         $currentPressure    = $meteoData['current']['surface_pressure'] ?? null;
         $currentVisibility  = $meteoData['current']['visibility'] ?? null;
         $wmoCodes = [
-            0=>'Clear Sky', 1=>'Mainly Clear', 2=>'Partly Cloudy', 3=>'Overcast',
-            45=>'Foggy', 48=>'Icy Fog',
-            51=>'Light Drizzle', 53=>'Drizzle', 55=>'Heavy Drizzle',
-            61=>'Light Rain', 63=>'Rain', 65=>'Heavy Rain',
-            80=>'Rain Showers', 81=>'Heavy Showers', 82=>'Violent Showers',
-            95=>'Thunderstorm', 96=>'Thunderstorm w/ Hail', 99=>'Heavy Thunderstorm',
+            0=>'Langit Cerah', 1=>'Kebanyakan Cerah', 2=>'Sebahagian Berawan', 3=>'Mendung',
+            45=>'Berkabus', 48=>'Kabus Beku',
+            51=>'Hujan Renyai Ringan', 53=>'Hujan Renyai', 55=>'Hujan Renyai Lebat',
+            61=>'Hujan Ringan', 63=>'Hujan', 65=>'Hujan Lebat',
+            80=>'Hujan Lebat Seketika', 81=>'Hujan Lebat', 82=>'Hujan Lebat Sangat',
+            95=>'Ribut Petir', 96=>'Ribut Petir dengan Hujan Batu', 99=>'Ribut Petir Kuat',
         ];
         $wcode          = $meteoData['current']['weathercode'] ?? null;
-        $currentWeather = $wmoCodes[$wcode] ?? 'Unknown';
+        $currentWeather = $wmoCodes[$wcode] ?? 'Tidak Diketahui';
     }
 }
 function windDirCompass($deg) {
@@ -306,26 +306,27 @@ if ($warningData) {
 $currentTime = date('l, F j, Y g:i A');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Weather Service Malaysia - Klang Valley</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Cuaca Lembah Klang — Jabatan Meteorologi Malaysia (Prototaip)</title>
+    <link rel="stylesheet" href="style.css?v=<?php echo filemtime(__DIR__.'/style.css'); ?>">
 </head>
 <body>
     <div class="header">
         <div class="container">
             <a href="/" class="header-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="22" r="10" fill="#FFD54F"/><line x1="32" y1="4" x2="32" y2="10" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="34" x2="32" y2="40" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="20" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="22" x2="50" y2="22" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="8" x2="22" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="32" x2="46" y2="36" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="8" x2="42" y2="12" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="36" x2="22" y2="32" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/><rect x="8" y="36" width="48" height="18" rx="9" fill="white" opacity="0.95"/><circle cx="20" cy="36" r="9" fill="white" opacity="0.95"/><circle cx="36" cy="32" r="12" fill="white" opacity="0.95"/><circle cx="50" cy="37" r="7" fill="white" opacity="0.95"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="22" r="10" fill="#FFD54F"/><line x1="32" y1="4" x2="32" y2="10" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="32" y1="34" x2="32" y2="40" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="14" y1="22" x2="20" y2="22" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="22" x2="50" y2="22" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="8" x2="22" y2="12" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="42" y1="32" x2="46" y2="36" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="46" y1="8" x2="42" y2="12" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><line x1="18" y1="36" x2="22" y2="32" stroke="#a9c25d" stroke-width="3" stroke-linecap="round"/><rect x="8" y="36" width="48" height="18" rx="9" fill="white" opacity="0.95"/><circle cx="20" cy="36" r="9" fill="white" opacity="0.95"/><circle cx="36" cy="32" r="12" fill="white" opacity="0.95"/><circle cx="50" cy="37" r="7" fill="white" opacity="0.95"/></svg>
                 <div>
-                    <div class="header-title">Cuaca Lembah Klang</div>
-                    <div class="header-subtitle">PERKHIDMATAN RAMALAN CUACA</div>
+                    <div class="header-title">JABATAN METEOROLOGI MALAYSIA</div>
+                    <div class="header-subtitle">Cuaca Lembah Klang</div>
                 </div>
             </a>
         </div>
     </div>
 
+    <!-- NAV -->
     <div class="nav">
 		<div class="container">
 			<div class="nav-inner">
@@ -340,8 +341,14 @@ $currentTime = date('l, F j, Y g:i A');
 						<?php endforeach; ?>
 					</select>
 				</form>
-				<a href="#warnings">CURRENT HAZARDS</a>
-				<a href="#forecast">FORECAST</a>
+				<a href="#current-conditions">KEADAAN SEMASA</a>
+				<a href="#warnings">AMARAN</a>
+				<a href="#forecast">RAMALAN</a>
+				<a href="https://www.met.gov.my/pencerapan/nowcasting/" target="_blank">NOWCASTING</a>
+				<span class="nav-item">IKLIM</span>
+				<span class="nav-item">PENERBITAN</span>
+				<span class="nav-item">PENDIDIKAN</span>
+				<span class="nav-item">TENTANG KAMI</span>
 			</div>
 		</div>
     </div>
@@ -369,57 +376,55 @@ $currentTime = date('l, F j, Y g:i A');
 					</div>
 					<?php endif; ?>
 
-					<!-- CURRENT CONDITIONS STRIP -->
+					<!-- KEADAAN SEMASA -->
 					<?php if ($currentTemp !== null): ?>
 
 					<?php
-					// Force default location if value is missing, null, empty, or "null"
 					$displayLocation = $selectedLocation;
-
 					if (!isset($displayLocation) || $displayLocation === null || trim($displayLocation) === '' || strtolower($displayLocation) === 'null') {
 						$displayLocation = 'Kuala Lumpur';
 					}
 					?>
 
-					<div class="current-conditions">
+					<div id="current-conditions" class="current-conditions">
 
-						<!-- Left: big temp + condition -->
+						<!-- Kiri: suhu besar + keadaan -->
 						<div class="conditions-left">
-							<div class="conditions-label">Current Conditions</div>
+							<div class="conditions-label">Keadaan Semasa</div>
 							<div class="conditions-location"><?php echo htmlspecialchars($displayLocation); ?></div>
 							<div class="conditions-temp"><?php echo round($currentTemp); ?>°C</div>
 							<div class="conditions-weather"><?php echo htmlspecialchars($currentWeather ?? ''); ?></div>
 						</div>
 
-						<!-- Right: detail table -->
+						<!-- Kanan: jadual butiran -->
 						<div class="conditions-right">
 							<table class="conditions-table">
 								<tr>
-									<td class="lbl">Humidity</td>
-									<td><?php echo $currentHumidity ?? 'N/A'; ?>%</td>
-									<td class="lbl2">Dew Point</td>
-									<td><?php echo $currentDewpoint !== null ? round($currentDewpoint).'°C' : 'N/A'; ?></td>
+									<td class="lbl">Kelembapan</td>
+									<td><?php echo $currentHumidity ?? 'T/A'; ?>%</td>
+									<td class="lbl2">Titik Embun</td>
+									<td><?php echo $currentDewpoint !== null ? round($currentDewpoint).'°C' : 'T/A'; ?></td>
 								</tr>
 								<tr>
-									<td class="lbl">Wind</td>
-									<td><?php echo $currentWind !== null ? $currentWind.' km/h '.windDirCompass($currentWindDir) : 'N/A'; ?></td>
-									<td class="lbl2">Feels Like</td>
-									<td><?php echo $currentFeelsLike !== null ? round($currentFeelsLike).'°C' : 'N/A'; ?></td>
+									<td class="lbl">Angin</td>
+									<td><?php echo $currentWind !== null ? $currentWind.' km/j '.windDirCompass($currentWindDir) : 'T/A'; ?></td>
+									<td class="lbl2">Rasa Seperti</td>
+									<td><?php echo $currentFeelsLike !== null ? round($currentFeelsLike).'°C' : 'T/A'; ?></td>
 								</tr>
 								<tr>
-									<td class="lbl">Pressure</td>
-									<td><?php echo $currentPressure !== null ? round($currentPressure).' hPa' : 'N/A'; ?></td>
-									<td class="lbl2">Visibility</td>
-									<td><?php echo $currentVisibility !== null ? round($currentVisibility/1000,1).' km' : 'N/A'; ?></td>
+									<td class="lbl">Tekanan</td>
+									<td><?php echo $currentPressure !== null ? round($currentPressure).' hPa' : 'T/A'; ?></td>
+									<td class="lbl2">Jarak Pandang</td>
+									<td><?php echo $currentVisibility !== null ? round($currentVisibility/1000,1).' km' : 'T/A'; ?></td>
 								</tr>
 								<tr>
-									<td class="lbl">Precipitation</td>
-									<td><?php echo $currentPrecip !== null ? $currentPrecip.' mm' : 'N/A'; ?></td>
-									<td class="lbl2">Cloud Cover</td>
-									<td><?php echo $currentCloud !== null ? $currentCloud.'%' : 'N/A'; ?></td>
+									<td class="lbl">Hujan</td>
+									<td><?php echo $currentPrecip !== null ? $currentPrecip.' mm' : 'T/A'; ?></td>
+									<td class="lbl2">Liputan Awan</td>
+									<td><?php echo $currentCloud !== null ? $currentCloud.'%' : 'T/A'; ?></td>
 								</tr>
 								<tr>
-									<td colspan="4" class="conditions-source">Source: Open-Meteo</td>
+									<td colspan="4" class="conditions-source">Sumber: Open-Meteo</td>
 								</tr>
 							</table>
 						</div>
@@ -428,23 +433,20 @@ $currentTime = date('l, F j, Y g:i A');
 
 					<?php endif; ?>
 
-                    <!-- WARNINGS SECTION -->
+                    <!-- BAHAGIAN AMARAN -->
                     <div id="warnings" class="warning-section">
-                        <div class="section-title">WATCHES, WARNINGS &amp; ADVISORIES<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
+                        <div class="section-title">AMARAN, WASPADA &amp; NASIHAT<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
                         <?php if ($warningData === null): ?>
-                            <div class="error">ERROR: Unable to load warning data from MET Malaysia API</div>
+                            <div class="error">RALAT: Tidak dapat memuatkan data amaran daripada API MetMalaysia</div>
                         <?php elseif (empty($filteredWarnings)): ?>
-                            <div class="no-warnings">&#10003; NO ACTIVE WARNINGS OR ADVISORIES<?php echo $selectedLocation ? ' AFFECTING ' . htmlspecialchars(strtoupper($selectedLocation)) : ' FOR KLANG VALLEY'; ?> AT THIS TIME</div>
+                            <div class="no-warnings">&#10003; TIADA AMARAN AKTIF<?php echo $selectedLocation ? ' MEMPENGARUHI ' . htmlspecialchars(strtoupper($selectedLocation)) : ' UNTUK LEMBAH KLANG'; ?> PADA MASA INI</div>
                         <?php else: ?>
-                            <div class="update-time">
-                                <?php echo count($filteredWarnings); ?> active warning(s) — click to expand
-                            </div>
                             <?php foreach ($filteredWarnings as $i => $warning): ?>
                                 <?php
-                                $issued    = isset($warning['warning_issue']['issued']) ? date('D, M j, Y g:i A', strtotime($warning['warning_issue']['issued'])) : 'N/A';
-                                $validFrom = isset($warning['valid_from'])              ? date('D, M j, Y g:i A', strtotime($warning['valid_from']))              : 'N/A';
-                                $validTo   = isset($warning['valid_to'])                ? date('D, M j, Y g:i A', strtotime($warning['valid_to']))                : 'N/A';
-                                $title     = htmlspecialchars($warning['warning_issue']['title_en'] ?: ($warning['warning_issue']['title_bm'] ?? 'Warning'));
+                                $issued    = isset($warning['warning_issue']['issued']) ? date('D, M j, Y g:i A', strtotime($warning['warning_issue']['issued'])) : 'T/A';
+                                $validFrom = isset($warning['valid_from'])              ? date('D, M j, Y g:i A', strtotime($warning['valid_from']))              : 'T/A';
+                                $validTo   = isset($warning['valid_to'])                ? date('D, M j, Y g:i A', strtotime($warning['valid_to']))                : 'T/A';
+                                $title     = htmlspecialchars($warning['warning_issue']['title_bm'] ?: ($warning['warning_issue']['title_bm'] ?? 'Amaran'));
                                 $bodyId    = 'warning-body-' . $i;
                                 $iconId    = 'warning-icon-' . $i;
                                 ?>
@@ -455,21 +457,21 @@ $currentTime = date('l, F j, Y g:i A');
                                     </div>
                                     <div class="warning-body" id="<?php echo $bodyId; ?>">
                                         <div class="warning-meta">
-                                            <strong>ISSUED:</strong> <?php echo $issued; ?><br>
-                                            <strong>VALID FROM:</strong> <?php echo $validFrom; ?><br>
-                                            <strong>VALID TO:</strong> <?php echo $validTo; ?>
+                                            <strong>DIKELUARKAN:</strong> <?php echo $issued; ?><br>
+                                            <strong>SAH DARI:</strong> <?php echo $validFrom; ?><br>
+                                            <strong>SAH SEHINGGA:</strong> <?php echo $validTo; ?>
                                         </div>
-                                        <?php if (!empty($warning['heading_en'])): ?>
+                                        <?php if (!empty($warning['heading_bm'])): ?>
                                             <div class="warning-heading">
-                                                <?php echo htmlspecialchars($warning['heading_en']); ?>
+                                                <?php echo htmlspecialchars($warning['heading_bm']); ?>
                                             </div>
                                         <?php endif; ?>
                                         <div class="warning-text">
-                                            <?php echo nl2br(htmlspecialchars($warning['text_bm'] ?: 'N/A')); ?>
+                                            <?php echo nl2br(htmlspecialchars($warning['text_bm'] ?: 'T/A')); ?>
                                         </div>
                                         <?php if (!empty($warning['instruction_en'])): ?>
                                             <div class="warning-text">
-                                                <strong>INSTRUCTIONS:</strong><br>
+                                                <strong>ARAHAN:</strong><br>
                                                 <?php echo nl2br(htmlspecialchars($warning['instruction_en'])); ?>
                                             </div>
                                         <?php endif; ?>
@@ -478,31 +480,30 @@ $currentTime = date('l, F j, Y g:i A');
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
-                    
+
                     <!-- RADAR MALAYSIA -->
-                    <div class="section">
+                    <div id="radar" class="section">
                         <div class="section-title">RADAR MALAYSIA</div>
                         <div class="radar-wrap">
                             <img src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
-                                 alt="Malaysia Weather Radar"
+                                 alt="Radar Cuaca Malaysia"
                                  class="radar-img">
                             <div class="radar-caption">
                                 Komposit Radar Cuaca Malaysia &mdash;
-                                <a href="https://www.met.gov.my" target="_blank">MET Malaysia</a>
+                                <a href="https://www.met.gov.my" target="_blank">MetMalaysia</a>
                                 &bull; Dikemaskini setiap ~10 minit
                             </div>
                         </div>
                     </div>
 
-                    <!-- FORECAST SECTION -->
+                    <!-- BAHAGIAN RAMALAN -->
                     <div id="forecast" class="section">
-                        <div class="section-title">7-DAY FORECAST<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
+                        <div class="section-title">RAMALAN 7 HARI<?php echo $selectedLocation ? ' &mdash; ' . htmlspecialchars(strtoupper($selectedLocation)) : ''; ?></div>
                         <?php if ($forecastData === null): ?>
-                            <div class="error">ERROR: Unable to load forecast data from MET Malaysia API</div>
+                            <div class="error">RALAT: Tidak dapat memuatkan data ramalan daripada API MetMalaysia</div>
                         <?php elseif (empty($filteredForecasts)): ?>
-                            <div class="error">NO FORECAST DATA AVAILABLE FOR <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
+                            <div class="error">TIADA DATA RAMALAN UNTUK <?php echo htmlspecialchars(strtoupper($selectedLocation)); ?></div>
                         <?php else: ?>
-                            <div class="update-time">Forecast issued: Daily by MET Malaysia</div>
                             <?php foreach ($filteredForecasts as $location => $forecasts): ?>
                                 <div class="location-header" id="<?php echo $locationAnchors[$location] ?? ''; ?>">
                                     <?php echo htmlspecialchars($location); ?>
@@ -510,12 +511,12 @@ $currentTime = date('l, F j, Y g:i A');
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>DATE</th>
-                                            <th>MORNING</th>
-                                            <th>AFTERNOON</th>
-                                            <th>NIGHT</th>
-                                            <th>SUMMARY</th>
-                                            <th>TEMP (°C)</th>
+                                            <th>TARIKH</th>
+                                            <th>PAGI</th>
+                                            <th>PETANG</th>
+                                            <th>MALAM</th>
+                                            <th>RINGKASAN</th>
+                                            <th>SUHU (°C)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -536,8 +537,8 @@ $currentTime = date('l, F j, Y g:i A');
                                                 <small>(<?php echo htmlspecialchars($forecast['summary_when']); ?>)</small>
                                             </td>
                                             <td class="temp-data">
-                                                High: <span class="temp-high"><?php echo $forecast['max_temp']; ?>°</span> /
-                                                Low: <span class="temp-low"><?php echo $forecast['min_temp']; ?>°</span>
+                                                Maks: <span class="temp-high"><?php echo $forecast['max_temp']; ?>°</span> /
+                                                Min: <span class="temp-low"><?php echo $forecast['min_temp']; ?>°</span>
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>
@@ -553,7 +554,7 @@ $currentTime = date('l, F j, Y g:i A');
 
                 <div class="sidebar">
 
-                    <!-- MET WARNING MAPS -->
+                    <!-- PETA AMARAN MET -->
                     <?php
                     $warningMaps = [
                         ['url' => 'https://www.met.gov.my/data/AmaranHujanLebat.jpg',      'label' => 'Amaran Hujan Lebat'],
@@ -572,35 +573,56 @@ $currentTime = date('l, F j, Y g:i A');
                     </div>
                     <?php endforeach; ?>
 
-                    <div class="info-box">
-                        <h3>API STATUS</h3>
-                        <p>
-                            <strong>Forecast:</strong>
-                            <span class="<?php echo $forecastData   ? 'status-online' : 'status-offline'; ?>">
-                                <?php echo $forecastData   ? '✓ Online' : '✗ Error'; ?>
-                            </span><br>
-                            <strong>Warnings:</strong>
-                            <span class="<?php echo $warningData    ? 'status-online' : 'status-offline'; ?>">
-                                <?php echo $warningData    ? '✓ Online' : '✗ Error'; ?>
-                            </span>
-                        </p>
-                        <p class="api-updated">Updated: <?php echo $currentTime; ?></p>
-                    </div>
-
-                    <div class="info-box">
-                        <h3>QUICK LINKS</h3>
-                        <ul>
-                            <li><a href="https://www.met.gov.my/pencerapan/nowcasting/" target="_blank">Nowcasting</a></li>
-                            <li><a href="https://www.met.gov.my/iklim/status-cuaca-panas/" target="_blank">Status Cuaca Panas</a></li>
-                            <li><a href="https://www.met.gov.my/data/pocgn/ramalancuacakhas_bm.pdf" target="_blank">Ramalan Cuaca Khas</a></li>
-                            <li><a href="<?php echo $forecastApiUrl; ?>" target="_blank">Raw Forecast Data</a></li>
-                            <li><a href="<?php echo $warningApiUrl; ?>" target="_blank">Raw Warning Data</a></li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-wrap">
+            <!-- Col 1: brand + social -->
+            <div>
+                <strong>Kementerian Sumber Asli dan Kelestarian Alam</strong><br>
+				Jabatan Meteorologi Malaysia<br>
+				Jalan Sultan<br>
+				46667, Petaling Jaya, Selangor<br>
+                Hotline: 1-300-22-1638<br>
+                <div class="footer-social">
+                    <span class="social-icon" title="Facebook"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></span>
+                    <span class="social-icon" title="Twitter/X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+                    <span class="social-icon" title="Instagram"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>
+                    <span class="social-icon" title="YouTube"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg></span>
+                    <span class="social-icon" title="TikTok"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg></span>
+                </div>
+            </div>
+            <!-- Col 2: quick links -->
+            <div>
+                <strong>Pautan Pantas</strong><br>
+                <a href="https://www.met.gov.my/pencerapan/nowcasting/" target="_blank">Nowcasting</a><br>
+                <a href="https://www.met.gov.my/iklim/status-cuaca-panas/" target="_blank">Status Cuaca Panas</a><br>
+                <a href="https://www.met.gov.my/data/pocgn/ramalancuacakhas_bm.pdf" target="_blank">Ramalan Cuaca Khas</a><br>
+                <a href="<?php echo $forecastApiUrl; ?>" target="_blank">Data Ramalan</a><br>
+                <a href="<?php echo $warningApiUrl; ?>" target="_blank">Data Amaran</a>
+            </div>
+            <!-- Col 3: API status -->
+            <div>
+                <strong>Status API</strong><br>
+                Ramalan: <span class="<?php echo $forecastData ? 'status-online' : 'status-offline'; ?>"><?php echo $forecastData ? '✓ Dalam Talian' : '✗ Ralat'; ?></span><br>
+                Amaran: <span class="<?php echo $warningData ? 'status-online' : 'status-offline'; ?>"><?php echo $warningData ? '✓ Dalam Talian' : '✗ Ralat'; ?></span><br>
+                <span style="color:#999;font-size:11px"><?php echo $currentTime; ?></span>
+            </div>
+            <!-- Col 4: Policies -->
+            <div>
+                <strong>Dasar</strong><br>
+				Dasar Penafian<br>
+				Dasar Keselamatan<br>
+				Dasar Privasi<br>
+                Kenyataan Hak Cipta<br>
+            </div>
+        </div>
+    </footer>
+
 
     <script>
         function toggleWarning(bodyId, iconId) {
@@ -616,17 +638,14 @@ $currentTime = date('l, F j, Y g:i A');
         }
 
         function jumpTo(zone, anchorId) {
-            // Highlight clicked zone
             document.querySelectorAll('.map-zone').forEach(function(z) {
                 z.classList.remove('map-zone-active');
             });
             zone.classList.add('map-zone-active');
 
-            // Scroll to the location header
             var target = document.getElementById(anchorId);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Flash highlight
                 target.classList.add('location-header-flash');
                 setTimeout(function() {
                     target.classList.remove('location-header-flash');

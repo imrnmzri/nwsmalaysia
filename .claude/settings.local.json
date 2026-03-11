@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.met.gov.my)",
+      "WebFetch(domain:www.weather.gov)"
+    ]
+  }
+}
