@@ -238,6 +238,7 @@ if ($warningData) {
 // Fetch current conditions from Open-Meteo (free, no key)
 $currentTemp = $currentWeather = $currentHumidity = $currentWind = null;
 $currentFeelsLike = $currentDewpoint = $currentPrecip = $currentCloud = $currentPressure = $currentVisibility = $currentWindDir = null;
+$wcode = null;
 $coords = null;
 foreach ($townCoords as $town => $c) {
     if (stripos($selectedLocation, $town) !== false || stripos($town, $selectedLocation) !== false) {
@@ -278,6 +279,34 @@ function windDirCompass($deg) {
     return $dirs[round($deg / 22.5) % 16];
 }
 
+// Map WMO weather code to NWS forecast icon URL
+function wmoToNwsIcon($wcode, $isDay = true) {
+    $base = 'https://forecast.weather.gov/images/wtf/';
+    $d    = $isDay;
+    $map  = [
+        0  => $d ? 'skc'  : 'nskc',   // Clear sky
+        1  => $d ? 'few'  : 'nfew',   // Mainly clear
+        2  => $d ? 'sct'  : 'nsct',   // Partly cloudy
+        3  => $d ? 'ovc'  : 'novc',   // Overcast
+        45 => $d ? 'fg'   : 'nfg',    // Fog
+        48 => $d ? 'fg'   : 'nfg',    // Icy fog
+        51 => $d ? 'ra'   : 'nra',    // Light drizzle
+        53 => $d ? 'ra'   : 'nra',    // Drizzle
+        55 => $d ? 'ra'   : 'nra',    // Dense drizzle
+        61 => $d ? 'ra'   : 'nra',    // Slight rain
+        63 => $d ? 'ra'   : 'nra',    // Moderate rain
+        65 => $d ? 'ra'   : 'nra',    // Heavy rain
+        80 => 'shra',                  // Slight showers
+        81 => 'shra',                  // Moderate showers
+        82 => 'shra',                  // Violent showers
+        95 => $d ? 'tsra' : 'ntsra',  // Thunderstorm
+        96 => $d ? 'tsra' : 'ntsra',  // Thunderstorm + hail
+        99 => $d ? 'tsra' : 'ntsra',  // Heavy thunderstorm
+    ];
+    $icon = $map[$wcode] ?? ($d ? 'sct' : 'nsct');
+    return $base . $icon . '.jpg';
+}
+
 // Keywords from CSV: all Klang Valley location names + state names
 $kvKeywords = array_map('strtolower', array_merge($klangValleyStates, $klangValleyLocNames));
 
@@ -312,6 +341,25 @@ $currentTime = date('l, F j, Y g:i A');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cuaca Lembah Klang — Jabatan Meteorologi Malaysia (Prototaip)</title>
     <link rel="stylesheet" href="style.css?v=<?php echo filemtime(__DIR__.'/style.css'); ?>">
+    <style>
+        /* NWS weather icon next to city/temp/description */
+        .conditions-temp-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .conditions-wx-icon {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .conditions-main-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -331,9 +379,9 @@ $currentTime = date('l, F j, Y g:i A');
 		<div class="container">
 			<div class="nav-inner">
 				<form method="get" action="" class="nav-form">
-					<label for="loc-select" class="nav-label">KAWASAN:</label>
+					<label for="loc-select" class="nav-label">BANDAR:</label>
 					<select id="loc-select" name="location" onchange="this.form.submit();" class="nav-select">
-						<option value="" <?php echo ($selectedLocation === '') ? 'selected' : ''; ?>>— Semua Kawasan —</option>
+						<option value="" <?php echo ($selectedLocation === '') ? 'selected' : ''; ?>>— Semua Bandar —</option>
 						<?php foreach ($allLocationNames as $name): ?>
 						<option value="<?php echo htmlspecialchars($name); ?>" <?php echo ($name === $selectedLocation) ? 'selected' : ''; ?>>
 							<?php echo htmlspecialchars($name); ?>
@@ -349,6 +397,7 @@ $currentTime = date('l, F j, Y g:i A');
 				<span class="nav-item">PENERBITAN</span>
 				<span class="nav-item">PENDIDIKAN</span>
 				<span class="nav-item">TENTANG KAMI</span>
+				<div id="google_translate_element" class="nav-translate"></div>
 			</div>
 		</div>
     </div>
@@ -384,16 +433,28 @@ $currentTime = date('l, F j, Y g:i A');
 					if (!isset($displayLocation) || $displayLocation === null || trim($displayLocation) === '' || strtolower($displayLocation) === 'null') {
 						$displayLocation = 'Kuala Lumpur';
 					}
+					// Determine day (6am–8pm KL time) for icon selection
+					$isDay = (int)date('H', time()) >= 6 && (int)date('H', time()) < 20;
 					?>
 
 					<div id="current-conditions" class="current-conditions">
 
-						<!-- Kiri: suhu besar + keadaan -->
+						<!-- Kiri: ikon + bandar/suhu/keadaan -->
 						<div class="conditions-left">
 							<div class="conditions-label">Keadaan Semasa</div>
-							<div class="conditions-location"><?php echo htmlspecialchars($displayLocation); ?></div>
-							<div class="conditions-temp"><?php echo round($currentTemp); ?>°C</div>
-							<div class="conditions-weather"><?php echo htmlspecialchars($currentWeather ?? ''); ?></div>
+							<div class="conditions-temp-row">
+								<?php if ($wcode !== null): ?>
+								<img src="<?php echo htmlspecialchars(wmoToNwsIcon($wcode, $isDay)); ?>"
+								     alt="<?php echo htmlspecialchars($currentWeather ?? ''); ?>"
+								     class="conditions-wx-icon"
+								     title="<?php echo htmlspecialchars($currentWeather ?? ''); ?>">
+								<?php endif; ?>
+								<div class="conditions-main-info">
+									<div class="conditions-location"><?php echo htmlspecialchars($displayLocation); ?></div>
+									<div class="conditions-temp"><?php echo round($currentTemp); ?>°C</div>
+									<div class="conditions-weather"><?php echo htmlspecialchars($currentWeather ?? ''); ?></div>
+								</div>
+							</div>
 						</div>
 
 						<!-- Kanan: jadual butiran -->
@@ -432,6 +493,21 @@ $currentTime = date('l, F j, Y g:i A');
 					</div>
 
 					<?php endif; ?>
+
+                    <!-- RADAR MALAYSIA -->
+                    <div id="radar" class="section">
+                        <div class="section-title">RADAR MALAYSIA</div>
+                        <div class="radar-wrap">
+                            <img src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
+                                 alt="Radar Cuaca Malaysia"
+                                 class="radar-img">
+                            <div class="radar-caption">
+                                Komposit Radar Cuaca Malaysia &mdash;
+                                <a href="https://www.met.gov.my" target="_blank">MetMalaysia</a>
+                                &bull; Dikemaskini setiap ~10 minit
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- BAHAGIAN AMARAN -->
                     <div id="warnings" class="warning-section">
@@ -479,21 +555,6 @@ $currentTime = date('l, F j, Y g:i A');
                                 </div>
                             <?php endforeach; ?>
                         <?php endif; ?>
-                    </div>
-
-                    <!-- RADAR MALAYSIA -->
-                    <div id="radar" class="section">
-                        <div class="section-title">RADAR MALAYSIA</div>
-                        <div class="radar-wrap">
-                            <img src="https://www.met.gov.my/data/radar_malaysia.gif?<?php echo time(); ?>"
-                                 alt="Radar Cuaca Malaysia"
-                                 class="radar-img">
-                            <div class="radar-caption">
-                                Komposit Radar Cuaca Malaysia &mdash;
-                                <a href="https://www.met.gov.my" target="_blank">MetMalaysia</a>
-                                &bull; Dikemaskini setiap ~10 minit
-                            </div>
-                        </div>
                     </div>
 
                     <!-- BAHAGIAN RAMALAN -->
@@ -553,6 +614,25 @@ $currentTime = date('l, F j, Y g:i A');
                 </div>
 
                 <div class="sidebar">
+
+                    <!-- SIARAN MEDIA -->
+                    <div class="sidebar-box siaran-media-box">
+                        <div class="sidebar-box-title">SIARAN MEDIA</div>
+                        <ul class="siaran-media-list">
+                            <li>
+                                <span class="siaran-date">10 Mac 2026</span>
+                                <span class="siaran-title">Kemas Kini Amaran Hujan Berterusan (Buruk) 10.30am</span>
+                            </li>
+                            <li>
+                                <span class="siaran-date">10 Mac 2026</span>
+                                <span class="siaran-title">Gempa Bumi Kuat di Laut Tyrrhenian pada 7.03 pagi</span>
+                            </li>
+                            <li>
+                                <span class="siaran-date">10 November 2025</span>
+                                <span class="siaran-title">Kenyataan Media Permulaan Monsun Timur Laut 2025/2026</span>
+                            </li>
+                        </ul>
+                    </div>
 
                     <!-- PETA AMARAN MET -->
                     <?php
@@ -623,6 +703,17 @@ $currentTime = date('l, F j, Y g:i A');
         </div>
     </footer>
 
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'ms',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script>
         function toggleWarning(bodyId, iconId) {

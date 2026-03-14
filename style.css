@@ -207,14 +207,12 @@ body {
 .conditions-location {
     font-size: 13px;
     font-weight: bold;
-    margin-bottom: 6px;
 }
 
 .conditions-temp {
-    font-size: 42px;
+    font-size: 30px;
     font-weight: bold;
-    line-height: 1;
-    margin-bottom: 4px;
+    line-height: 1.1;
 }
 
 .conditions-weather {
@@ -535,6 +533,76 @@ tr:nth-child(even) { background: #F5F5F5; }
 
 .footer a:hover {
     text-decoration: underline;
+}
+
+/* Siaran Media sidebar box */
+.siaran-media-box {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.sidebar-box-title {
+    background: #1b3958;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+}
+
+.siaran-media-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.siaran-media-list li {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.siaran-media-list li:last-child {
+    border-bottom: none;
+}
+
+.siaran-date {
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.siaran-title {
+    font-size: 12px;
+    color: #1b3958;
+    line-height: 1.4;
+}
+
+/* Google Translate nav widget */
+.nav-translate {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.nav-translate .goog-te-gadget-simple {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+    border-radius: 3px;
+    padding: 2px 6px;
+}
+
+.nav-translate .goog-te-gadget-simple a,
+.nav-translate .goog-te-gadget-simple span {
+    color: #1b3958 !important;
+    font-size: 11px !important;
 }
 
 @media (max-width: 1024px) {
